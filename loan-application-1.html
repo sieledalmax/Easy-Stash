@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Application | Easy Stash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0 30px;
+            position: relative;
+        }
+
+        .progress-steps:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--card-bg);
+            z-index: 1;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 3px;
+            background-color: var(--primary-blue);
+            z-index: 2;
+            width: 33%;
+            transition: width 0.3s;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            border: 2px solid var(--card-bg);
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .step.active .step-label {
+            color: var(--text-light);
+        }
+
+        /* Form Card */
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b8c2cc'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 15px;
+        }
+
+        .range-slider {
+            width: 100%;
+            margin: 20px 0 10px;
+        }
+
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-disabled {
+            background-color: var(--card-bg);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(93, 156, 236, 0.1);
+            border-radius: 8px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .user-details h4 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        .footer-text a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Easy Stash</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-bar"></div>
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-label">Loan Details</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-label">Finances</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">Review</div>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-avatar">JD</div>
+            <div class="user-details">
+                <h4>John Doe</h4>
+                <p>john.doe@example.com</p>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h3 class="form-title">What type of loan do you need?</h3>
+
+            <div class="form-group">
+                <label for="loan-purpose">Loan Purpose</label>
+                <select id="loan-purpose" class="form-control">
+                    <option value="" disabled selected>Select purpose</option>
+                    <option>Debt consolidation</option>
+                    <option>Home improvement</option>
+                    <option>Medical expenses</option>
+                    <option>Auto purchase</option>
+                    <option>Business investment</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="loan-amount">Loan Amount</label>
+                <input type="range" id="loan-amount" min="1000" max="50000" step="100" value="10000" class="range-slider">
+                <div class="range-values">
+                    <span>$1,000</span>
+                    <span>$50,000</span>
+                </div>
+                <input type="number" id="amount-display" class="form-control" value="10000" style="margin-top: 10px;">
+            </div>
+
+            <div class="form-group">
+                <label for="credit-score">Estimated Credit Score</label>
+                <select id="credit-score" class="form-control">
+                    <option value="" disabled selected>Select range</option>
+                    <option>Excellent (720+)</option>
+                    <option>Good (680-719)</option>
+                    <option>Fair (640-679)</option>
+                    <option>Poor (639 or below)</option>
+                    <option>I don't know</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="loan-term">Loan Term</label>
+                <select id="loan-term" class="form-control">
+                    <option value="" disabled selected>Select term</option>
+                    <option>12 months</option>
+                    <option>24 months</option>
+                    <option>36 months</option>
+                    <option>48 months</option>
+                    <option>60 months</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="continue-btn" class="btn btn-primary">Continue to Finances</button>
+
+        <p class="footer-text">
+            By continuing, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+            A soft credit check will be performed (no impact to your score).
+        </p>
+    </div>
+
+    <script>
+        // Update amount display when slider changes
+        document.getElementById('loan-amount').addEventListener('input', function() {
+            document.getElementById('amount-display').value = this.value;
+        });
+
+        // Update slider when amount display changes
+        document.getElementById('amount-display').addEventListener('input', function() {
+            const slider = document.getElementById('loan-amount');
+            let value = parseInt(this.value);
+            
+            if (value < 1000) value = 1000;
+            if (value > 50000) value = 50000;
+            
+            slider.value = value;
+            this.value = value;
+        });
+
+        // Simple navigation
+        document.getElementById('continue-btn').addEventListener('click', function() {
+            window.location.href = 'loan-application-2.html';
+        });
+    </script>
+</body>
+</html>

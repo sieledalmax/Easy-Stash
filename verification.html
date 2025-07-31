@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification | Easy Stash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+            flex: 1;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        /* Verification Content */
+        .verification-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verification-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .verification-header h2 {
+            font-size: 22px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .verification-header .badge {
+            display: inline-block;
+            background-color: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Verification Card */
+        .verification-card {
+            background: linear-gradient(135deg, rgba(93, 156, 236, 0.1), rgba(74, 137, 220, 0.1));
+            border: 1px solid rgba(93, 156, 236, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .verification-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin: 10px 0;
+        }
+
+        .verification-note {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        /* Benefits List */
+        .benefits-list {
+            margin: 25px 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .benefit-icon {
+            color: var(--success);
+            font-size: 18px;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+
+        .benefit-text {
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .benefit-text strong {
+            color: var(--text-light);
+        }
+
+        /* Security Badge */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(93, 156, 236, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 13px;
+            color: var(--primary-blue);
+        }
+
+        .security-badge i {
+            margin-right: 8px;
+            color: var(--success);
+            font-size: 18px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(93, 156, 236, 0.1);
+        }
+
+        /* Payment Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .payment-modal {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .payment-modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            background-color: var(--card-bg);
+            padding-top: 10px;
+            padding-bottom: 10px;
+            z-index: 1;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            color: var(--text-light);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--text-light);
+        }
+
+        .payment-amount {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .payment-amount .label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .payment-amount .amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        /* Payment Form */
+        .payment-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .payment-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .payment-form .input-group {
+            position: relative;
+        }
+
+        .payment-form input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: var(--darker-bg);
+            color: var(--text-light);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .payment-form input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .payment-form .card-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--text-muted);
+        }
+
+        .card-number-container {
+            position: relative;
+        }
+
+        .card-number-container .card-icon {
+            color: var(--text-light);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            min-width: 0; /* Prevent flex items from growing beyond container */
+        }
+
+        .payment-security {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .payment-security i {
+            margin-right: 8px;
+            color: var(--success);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--darker-bg);
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: auto;
+        }
+
+        /* Payment Providers */
+        .payment-providers {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .payment-providers img {
+            height: 24px;
+            filter: grayscale(100%) brightness(2);
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .verification-container {
+                padding: 20px 15px;
+            }
+            
+            .verification-header h2 {
+                font-size: 20px;
+            }
+            
+            .verification-amount {
+                font-size: 28px;
+            }
+
+            .payment-modal {
+                padding: 20px 15px;
+            }
+            
+            /* Keep form fields side by side on mobile */
+            .form-row {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                margin-right: -15px;
+                margin-left: -15px;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .form-row .form-group {
+                flex: 0 0 150px; /* Fixed width for small screens */
+            }
+            
+            /* Hide scrollbar */
+            .form-row::-webkit-scrollbar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Easy Stash</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Verification Container -->
+        <div class="verification-container">
+            <div class="verification-header">
+                <span class="badge">Security Verification</span>
+                <h2>One-Time Account Verification</h2>
+                <p>Final step before loan disbursement</p>
+            </div>
+
+            <div class="verification-card">
+                <div>Verification Deposit Amount</div>
+                <div class="verification-amount">$10.99</div>
+                <div class="verification-note">This amount will be added to your loan balance</div>
+            </div>
+
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="benefit-text">
+                        <strong>Why we need this:</strong> As a first-time client, we require this small deposit to verify your account and prevent system abuse by bots and fraudulent applications.
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="benefit-text">
+                        <strong>You get it back:</strong> This $10.99 will be added to your loan balance and disbursed to you along with your approved loan amount.
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-lock"></i></div>
+                    <div class="benefit-text">
+                        <strong>Secure processing:</strong> Your payment is processed through our PCI-DSS compliant payment system with bank-level encryption.
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-badge">
+                <i class="fas fa-lock"></i>
+                <span>256-bit SSL Encryption | Secure Payment Processing</span>
+            </div>
+
+            <button class="btn btn-primary" id="depositBtn">
+                <i class="fas fa-credit-card"></i> Make Verification Deposit ($10.99)
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="payment-modal">
+            <div class="modal-header">
+                <h3>Payment Details</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="payment-amount">
+                <div class="label">Verification Deposit Amount</div>
+                <div class="amount">$10.99</div>
+            </div>
+            
+            <form class="payment-form" id="paymentForm">
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <div class="input-group card-number-container">
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                        <i class="far fa-credit-card card-icon" id="cardTypeIcon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date</label>
+                        <div class="input-group">
+                            <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <div class="input-group">
+                            <input type="text" id="cvv" placeholder="123" maxlength="4">
+                            <i class="fas fa-question-circle card-icon" title="3-digit code on back of card"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payment-security">
+                    <i class="fas fa-lock"></i>
+                    <span>256-bit SSL Secured Payment | Your data is protected</span>
+                </div>
+                
+                <div class="payment-providers">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visa/visa-original.svg" alt="Visa">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mastercard/mastercard-original.svg" alt="Mastercard">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg" alt="Apple Pay">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-lock"></i> Pay Securely $10.99
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 Easy Stash. All rights reserved. Licensed lender.</p>
+    </footer>
+
+    <script>
+        // Payment Modal Toggle
+        const depositBtn = document.getElementById('depositBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        depositBtn.addEventListener('click', () => {
+            paymentModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeModal.addEventListener('click', () => {
+            paymentModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Card Number Formatting and Type Detection
+        const cardNumber = document.getElementById('cardNumber');
+        const cardTypeIcon = document.getElementById('cardTypeIcon');
+        
+        cardNumber.addEventListener('input', (e) => {
+            // Format with spaces every 4 digits
+            let value = e.target.value.replace(/\s+/g, '');
+            if (value.length > 0) {
+                value = value.match(new RegExp('.{1,4}', 'g')).join(' ');
+            }
+            e.target.value = value;
+            
+            // Detect card type and change icon
+            const firstDigit = value.charAt(0);
+            let cardType = 'credit-card';
+            
+            if (/^4/.test(value)) {
+                cardType = 'cc-visa';
+            } else if (/^5[1-5]/.test(value)) {
+                cardType = 'cc-mastercard';
+            } else if (/^3[47]/.test(value)) {
+                cardType = 'cc-amex';
+            } else if (/^6(?:011|5)/.test(value)) {
+                cardType = 'cc-discover';
+            }
+            
+            cardTypeIcon.className = `fab fa-${cardType} card-icon`;
+        });
+        
+        // Expiry Date Formatting
+        const expiryDate = document.getElementById('expiryDate');
+        
+        expiryDate.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+            
+            // Auto-tab to CVV when expiry date is complete
+            if (value.length === 5) {
+                document.getElementById('cvv').focus();
+            }
+        });
+        
+        // Form Submission
+        const paymentForm = document.getElementById('paymentForm');
+        
+        paymentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would normally process the payment
+            alert('Payment processing would happen here in a real implementation');
+            paymentModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            // window.location.href = "verification-success.html";
+        });
+    </script>
+</body>
+</html>

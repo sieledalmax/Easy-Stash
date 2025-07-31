@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Info | Easy Stash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Same CSS variables and base styles as Page 1 */
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        /* Copy all base styles from Page 1 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header - Same as Page 1 */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        /* Progress Steps - Updated for Step 2 */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0 30px;
+            position: relative;
+        }
+
+        .progress-steps:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--card-bg);
+            z-index: 1;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 3px;
+            background-color: var(--primary-blue);
+            z-index: 2;
+            width: 66%;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            border: 2px solid var(--card-bg);
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .step.active .step-label {
+            color: var(--text-light);
+        }
+
+        /* Form Card - Same as Page 1 */
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b8c2cc'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 15px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Employment Section */
+        .employment-type {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .employment-option {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .employment-option:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .employment-option.selected {
+            background-color: rgba(93, 156, 236, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .employment-option i {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: var(--primary-blue);
+        }
+
+        /* Bank Connection */
+        .bank-connect {
+            background-color: rgba(93, 156, 236, 0.1);
+            border: 1px dashed var(--primary-blue);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .bank-connect i {
+            font-size: 28px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .bank-connect p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Document Upload */
+        .upload-box {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .upload-box i {
+            font-size: 28px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .upload-box p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-box small {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Navigation Buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Footer */
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        .footer-text a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Easy Stash</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-bar"></div>
+            <div class="step completed">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-label">Loan Details</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <div class="step-label">Finances</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">Review</div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h3 class="form-title">Tell us about your finances</h3>
+
+            <div class="form-group">
+                <label>Employment Status</label>
+                <div class="employment-type">
+                    <div class="employment-option selected">
+                        <i class="fas fa-briefcase"></i>
+                        <p>Employed</p>
+                    </div>
+                    <div class="employment-option">
+                        <i class="fas fa-user-tie"></i>
+                        <p>Self-Employed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="employer">Employer Name</label>
+                <input type="text" id="employer" class="form-control" placeholder="Current employer">
+            </div>
+
+            <div class="form-group">
+                <label for="income">Monthly Income ($)</label>
+                <input type="number" id="income" class="form-control" placeholder="After taxes">
+            </div>
+
+            <div class="form-group">
+                <label>Connect Bank Account (Optional)</label>
+                <div class="bank-connect">
+                    <i class="fas fa-university"></i>
+                    <h4>Connect Securely</h4>
+                    <p>Verify income faster with 2 months of statements</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Documents</label>
+                <div class="upload-box">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h4>Upload Pay Stubs</h4>
+                    <p>Drag & drop or click to browse</p>
+                    <small>2 most recent pay stubs (PDF, JPG, PNG)</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-outline" onclick="window.location.href='loan-application-1.html'">Back</button>
+            <button class="btn btn-primary" onclick="window.location.href='loan-application-3.html'">Continue to Review</button>
+        </div>
+
+        <p class="footer-text">
+            Your information is secured with 256-bit encryption. We'll perform a soft credit check.
+        </p>
+    </div>
+</body>
+</html>
