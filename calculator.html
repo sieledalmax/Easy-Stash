@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Calculator | Easy Stash</title>
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" href="icons/icon.192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icons/icon.192.png">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        /* Container with max-width */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        .back-button {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-button i {
+            margin-right: 5px;
+        }
+
+        /* Page Title */
+        .page-title {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Calculator Styles */
+        .calculator-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .calculator-tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            padding: 10px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            position: relative;
+            width: 33%;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--primary-blue);
+        }
+
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background-color: var(--primary-blue);
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .range-slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--darker-bg);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Calculator Results */
+        .calculator-results {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .result-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .result-amount {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        /* Info Box */
+        .info-box {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .info-box h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-box h3 i {
+            margin-right: 8px;
+            color: var(--primary-blue);
+        }
+
+        .info-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--darker-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            .calculator-container {
+                padding: 30px;
+            }
+            
+            .page-title h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </a>
+                <div class="logo">
+                    <i class="fas fa-calculator"></i>
+                    <h1>Loan Calculator</h1>
+                </div>
+                <div style="width: 60px;"></div> <!-- Spacer for alignment -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-title">
+            <h1>Find Your Perfect Loan</h1>
+            <p>Adjust the sliders to see your options</p>
+        </div>
+
+        <!-- Loan Type Tabs -->
+        <div class="calculator-container">
+            <div class="calculator-tabs">
+                <div class="tab active" data-tab="personal">Personal</div>
+                <div class="tab" data-tab="business">Business</div>
+                <div class="tab" data-tab="auto">Auto</div>
+            </div>
+
+            <!-- Calculator Form -->
+            <form id="loan-calculator">
+                <div class="form-group">
+                    <label for="loan-amount">Loan Amount</label>
+                    <input type="number" id="loan-amount" class="form-control" value="10000" min="1000" max="50000" step="100">
+                    <div class="range-slider">
+                        <input type="range" id="loan-amount-slider" min="1000" max="50000" step="100" value="10000">
+                        <div class="range-values">
+                            <span>$1,000</span>
+                            <span>$50,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loan-term">Loan Term</label>
+                    <select id="loan-term" class="form-control">
+                        <option value="12">12 months</option>
+                        <option value="24">24 months</option>
+                        <option value="36">36 months</option>
+                        <option value="48">48 months</option>
+                        <option value="60">60 months</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="credit-score">Credit Score</label>
+                    <select id="credit-score" class="form-control">
+                        <option value="excellent">Excellent (720+)</option>
+                        <option value="good">Good (680-719)</option>
+                        <option value="fair">Fair (640-679)</option>
+                        <option value="poor">Poor (639 or below)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="loan-purpose">Loan Purpose</label>
+                    <select id="loan-purpose" class="form-control">
+                        <option>Debt Consolidation</option>
+                        <option>Emergency Expense</option>
+                        <option>Home Improvement</option>
+                        <option>Medical Bills</option>
+                        <option>Business Investment</option>
+                        <option>Vehicle Purchase</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <!-- Calculator Results -->
+                <div class="calculator-results">
+                    <div class="result-row">
+                        <span class="result-label">Loan Amount</span>
+                        <span class="result-value" id="display-amount">$10,000</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Interest Rate</span>
+                        <span class="result-value" id="interest-rate">8.99%</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Loan Term</span>
+                        <span class="result-value" id="display-term">36 months</span>
+                    </div>
+                    <div class="result-amount" id="monthly-payment">$318</div>
+                    <button type="button" class="btn btn-primary" id="apply-now">Apply Now</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h3><i class="fas fa-info-circle"></i> How It Works</h3>
+            <p>Our calculator provides estimates based on your inputs. Your actual rate and terms may vary after application. We perform a soft credit check that won't affect your credit score when you apply.</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="loan-application-1.html" class="nav-item">
+            <i class="fas fa-hand-holding-usd"></i>
+            <span>Loans</span>
+        </a>
+        <a href="calculator.html" class="nav-item active">
+            <i class="fas fa-calculator"></i>
+            <span>Calculator</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const loanAmountInput = document.getElementById('loan-amount');
+            const loanAmountSlider = document.getElementById('loan-amount-slider');
+            const loanTermSelect = document.getElementById('loan-term');
+            const creditScoreSelect = document.getElementById('credit-score');
+            const displayAmount = document.getElementById('display-amount');
+            const displayTerm = document.getElementById('display-term');
+            const interestRate = document.getElementById('interest-rate');
+            const monthlyPayment = document.getElementById('monthly-payment');
+            const tabs = document.querySelectorAll('.tab');
+            
+            // Sync loan amount inputs
+            loanAmountInput.addEventListener('input', function() {
+                loanAmountSlider.value = this.value;
+                updateCalculations();
+            });
+            
+            loanAmountSlider.addEventListener('input', function() {
+                loanAmountInput.value = this.value;
+                updateCalculations();
+            });
+            
+            // Update calculations when any input changes
+            loanTermSelect.addEventListener('change', updateCalculations);
+            creditScoreSelect.addEventListener('change', updateCalculations);
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    updateCalculations();
+                });
+            });
+            
+            // Initial calculation
+            updateCalculations();
+            
+            // Apply button
+            document.getElementById('apply-now').addEventListener('click', function() {
+                alert('Application process would start here!');
+            });
+            
+            // Calculation function
+            function updateCalculations() {
+                const amount = parseFloat(loanAmountInput.value);
+                const term = parseInt(loanTermSelect.value);
+                const creditScore = creditScoreSelect.value;
+                
+                // Format display values
+                displayAmount.textContent = '$' + amount.toLocaleString();
+                displayTerm.textContent = term + ' months';
+                
+                // Calculate interest rate based on credit score
+                let rate;
+                switch(creditScore) {
+                    case 'excellent':
+                        rate = 5.99;
+                        break;
+                    case 'good':
+                        rate = 8.99;
+                        break;
+                    case 'fair':
+                        rate = 12.99;
+                        break;
+                    case 'poor':
+                        rate = 18.99;
+                        break;
+                    default:
+                        rate = 8.99;
+                }
+                
+                interestRate.textContent = rate + '%';
+                
+                // Calculate monthly payment
+                const monthlyRate = rate / 100 / 12;
+                const payment = amount * monthlyRate * Math.pow(1 + monthlyRate, term) / (Math.pow(1 + monthlyRate, term) - 1);
+                
+                monthlyPayment.textContent = '$' + payment.toFixed(2);
+            }
+        });
+    </script>
+</body>
+</html>

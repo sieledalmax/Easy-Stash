@@ -245,8 +245,8 @@
                 <h2 class="auth-title">Create Account</h2>
                 <p class="auth-subtitle">Get started with your free account</p>
 
-                <!-- Social Signup Buttons -->
-                 <form>
+                <!-- Email Signup Form -->
+                <form id="signup-form">
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
                         <input type="text" id="fullname" class="form-control" placeholder="Enter your full name" required>
@@ -284,28 +284,64 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Create Account</button>
+                    <button type="submit" class="btn btn-primary" id="signup-button">
+                        <span id="signup-button-text">Create Account</span>
+                        <span id="signup-button-spinner" class="spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                    </button>
                 </form>
 
                 <div class="divider">or</div>
 
-                <!-- Email Signup Form -->
-                 <button class="btn btn-google">
-                    <i class="fab fa-google btn-icon"></i> Continue with Google
-                </button>
-                <button class="btn btn-apple">
-                    <i class="fab fa-apple btn-icon"></i> Continue with Apple
+                <!-- Google Signup Button -->
+                <button id="google-signup" class="btn btn-google">
+    <i class="fab fa-google btn-icon"></i>
+    <span class="btn-text">Continue with Google</span>
+</button>
+
+                <!-- Coming Soon Placeholder -->
+                <button id="apple-placeholder" class="btn btn-apple" disabled style="opacity: 0.7;">
+                    <i class="fab fa-apple btn-icon"></i> Coming Soon
                 </button>
                 
-            </div>
-
-            <div class="auth-footer">
-                Already have an account? <a href="login.html">Sign in</a>
+                <div class="auth-footer">
+                    Already have an account? <a href="login.html">Sign in</a>
+                </div>
             </div>
         </main>
     </div>
 
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.firebasestorage.app",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // UI Elements
+        const signupForm = document.getElementById('signup-form');
+        const signupButton = document.getElementById('signup-button');
+        const signupButtonText = document.getElementById('signup-button-text');
+        const signupButtonSpinner = document.getElementById('signup-button-spinner');
+        const googleSignupButton = document.getElementById('google-signup');
+        const applePlaceholder = document.getElementById('apple-placeholder');
+
         // Toggle password visibility
         document.querySelectorAll('.toggle-password').forEach(el => {
             el.addEventListener('click', function() {
@@ -328,6 +364,205 @@
             
             // Check for special character
             document.getElementById('special').classList.toggle('valid', /[!@#$%^&*]/.test(value));
+        });
+
+        // Show loading state
+        function showLoading(button, textElement, spinnerElement) {
+            button.disabled = true;
+            textElement.style.display = 'none';
+            spinnerElement.style.display = 'inline-block';
+        }
+
+        // Hide loading state
+        function hideLoading(button, textElement, spinnerElement) {
+            button.disabled = false;
+            textElement.style.display = 'inline-block';
+            spinnerElement.style.display = 'none';
+        }
+
+        // Show error message
+        function showError(message, elementId = null) {
+            // Remove any existing error messages
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.style.color = '#ed5565';
+            errorElement.style.marginTop = '10px';
+            errorElement.style.fontSize = '14px';
+            errorElement.textContent = message;
+            
+            if (elementId) {
+                const targetElement = document.getElementById(elementId);
+                if (targetElement) {
+                    targetElement.parentNode.insertBefore(errorElement, targetElement.nextSibling);
+                } else {
+                    signupForm.appendChild(errorElement);
+                }
+            } else {
+                signupForm.appendChild(errorElement);
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorElement.remove();
+            }, 5000);
+        }
+
+        // Save user data to Firestore
+        async function saveUserData(user, name) {
+            try {
+                await db.collection('users').doc(user.uid).set({
+                    uid: user.uid,
+                    email: user.email,
+                    name: name,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log("User data saved successfully");
+                // Redirect to dashboard or welcome page
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error("Error saving user data: ", error);
+                throw new Error("We couldn't save your profile data. Please try again.");
+            }
+        }
+
+        // Email/password signup
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const fullName = document.getElementById('fullname').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showError("Passwords don't match!", 'confirm-password');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 8 || !/\d/.test(password) || !/[!@#$%^&*]/.test(password)) {
+                showError("Password doesn't meet all requirements", 'password');
+                return;
+            }
+            
+            try {
+                showLoading(signupButton, signupButtonText, signupButtonSpinner);
+                
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Save user data to Firestore
+                await saveUserData(user, fullName);
+                
+            } catch (error) {
+                hideLoading(signupButton, signupButtonText, signupButtonSpinner);
+                console.error("Error signing up: ", error);
+                
+                // Handle specific error cases
+                let errorMessage = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "This email is already registered. Try signing in instead.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "Please enter a valid email address.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "Password should be at least 6 characters.";
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = "Network error. Please check your connection.";
+                }
+                
+                showError(errorMessage);
+            }
+        });
+
+        // Google signup - Fixed version
+        googleSignupButton.addEventListener('click', async () => {
+            try {
+                // Create a spinner element if it doesn't exist
+                let spinner = googleSignupButton.querySelector('.google-spinner');
+                if (!spinner) {
+                    spinner = document.createElement('span');
+                    spinner.className = 'google-spinner';
+                    spinner.innerHTML = ' <i class="fas fa-spinner fa-spin"></i>';
+                    spinner.style.display = 'none';
+                    googleSignupButton.appendChild(spinner);
+                }
+
+                // Hide the text and show spinner
+                const buttonText = googleSignupButton.querySelector('.btn-text');
+                if (buttonText) buttonText.style.display = 'none';
+                spinner.style.display = 'inline-block';
+                googleSignupButton.disabled = true;
+
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                if (result.additionalUserInfo.isNewUser) {
+                    const name = user.displayName || prompt("Please enter your full name:");
+                    if (!name) {
+                        await user.delete();
+                        throw new Error("Name is required to create an account.");
+                    }
+                    await saveUserData(user, name);
+                } else {
+                    await db.collection('users').doc(user.uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                console.error("Google signup error: ", error);
+                let errorMessage = error.message;
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = "Sign in was canceled.";
+                } else if (error.code === 'auth/cancelled-popup-request') {
+                    errorMessage = "Sign in process was canceled.";
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = "Network error. Please check your connection.";
+                }
+                showError(errorMessage);
+            } finally {
+                // Restore button state
+                const spinner = googleSignupButton.querySelector('.google-spinner');
+                const buttonText = googleSignupButton.querySelector('.btn-text');
+                if (spinner) spinner.style.display = 'none';
+                if (buttonText) buttonText.style.display = 'inline-block';
+                googleSignupButton.disabled = false;
+            }
+        });
+
+        // Coming soon placeholder
+        applePlaceholder.addEventListener('click', () => {
+            const comingSoonMessage = document.createElement('div');
+            comingSoonMessage.className = 'coming-soon-message';
+            comingSoonMessage.style.color = 'var(--primary-blue)';
+            comingSoonMessage.style.marginTop = '10px';
+            comingSoonMessage.style.fontSize = '14px';
+            comingSoonMessage.style.textAlign = 'center';
+            comingSoonMessage.textContent = 'Apple Sign-In is coming soon! Stay tuned.';
+            
+            // Remove any existing messages
+            document.querySelectorAll('.coming-soon-message').forEach(el => el.remove());
+            
+            applePlaceholder.parentNode.insertBefore(comingSoonMessage, applePlaceholder.nextSibling);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                comingSoonMessage.remove();
+            }, 3000);
+        });
+
+        // Handle auth state changes
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                console.log("User is logged in:", user.email);
+                // You might want to redirect if they're already logged in
+                // window.location.href = 'dashboard.html';
+            }
         });
     </script>
 </body>

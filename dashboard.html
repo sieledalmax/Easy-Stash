@@ -80,6 +80,7 @@
             justify-content: center;
             color: white;
             font-weight: bold;
+            cursor: pointer;
         }
 
         /* Main Content */
@@ -273,6 +274,134 @@
                 margin: 0 auto;
             }
         }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--card-bg);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast.success {
+            background-color: var(--success);
+        }
+
+        .toast.error {
+            background-color: var(--danger);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header i {
+            font-size: 40px;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .modal-body {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 25px;
+            border-radius: 25px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--darker-bg);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-blue);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -284,7 +413,7 @@
                     <i class="fas fa-hand-holding-usd"></i>
                     <h1>Easy Stash</h1>
                 </div>
-                <div class="user-avatar">JD</div>
+                <div class="user-avatar" id="userAvatar">JD</div>
             </div>
         </div>
     </header>
@@ -293,8 +422,8 @@
     <div class="container">
         <!-- Welcome Banner -->
         <div class="welcome-banner">
-            <h2>Welcome back, John!</h2>
-            <p>You have <strong>2 active loans</strong> and <strong>1 pending application</strong></p>
+            <h2 id="welcomeMessage">Welcome back, User!</h2>
+            <p>You have for your first loan today and enjoy very flexible rates.</p>
         </div>
 
         <!-- Quick Actions -->
@@ -309,19 +438,19 @@
                 <i class="fas fa-credit-card"></i>
                 <h3>Make Payment</h3>
                 <p>Pay your dues</p>
-                <a href="#" class="btn btn-outline">Pay Now</a>
+                <button class="btn btn-outline" id="makePaymentBtn">Pay Now</button>
             </div>
             <div class="action-card">
-                <i class="fas fa-chart-line"></i>
-                <h3>My Credit</h3>
-                <p>Score: 720</p>
-                <a href="#" class="btn btn-outline">View</a>
+                <i class="fas fa-calculator"></i>
+                <h3>Loan Calculator</h3>
+                <p>Calculator</p>
+                <a href="calculator.html" class="btn btn-outline">Open</a>
             </div>
             <div class="action-card">
                 <i class="fas fa-bell"></i>
                 <h3>Alerts</h3>
-                <p>2 notifications</p>
-                <a href="#" class="btn btn-outline">See All</a>
+                <p>Notifications</p>
+                <button class="btn btn-outline" id="notificationsBtn">See All</button>
             </div>
         </div>
 
@@ -396,18 +525,240 @@
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-file-invoice-dollar"></i>
+        <a href="loan-application-1.html" class="nav-item">
+            <i class="fas fa-hand-holding-usd"></i>
             <span>Loans</span>
         </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-wallet"></i>
-            <span>Payments</span>
+        <a href="calculator.html" class="nav-item">
+            <i class="fas fa-calculator"></i>
+            <span>Calculator</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="profile.html" class="nav-item">
             <i class="fas fa-user"></i>
             <span>Account</span>
         </a>
     </nav>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <i class="fas fa-credit-card"></i>
+                <h3>Payment Status</h3>
+            </div>
+            <div class="modal-body">
+                <div class="progress-container">
+                    <div class="progress-bar" id="paymentProgress"></div>
+                </div>
+                <p id="paymentMessage">Processing your payment request...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="paymentOkBtn" style="display: none;">Okay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div class="modal-overlay" id="notificationsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <i class="fas fa-bell"></i>
+                <h3>Notifications</h3>
+            </div>
+            <div class="modal-body">
+                <p>You currently have no new notifications.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="notificationsOkBtn">Okay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.firebasestorage.app",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const userAvatar = document.getElementById('userAvatar');
+        const toast = document.getElementById('toast');
+        const makePaymentBtn = document.getElementById('makePaymentBtn');
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const notificationsModal = document.getElementById('notificationsModal');
+        const paymentProgress = document.getElementById('paymentProgress');
+        const paymentMessage = document.getElementById('paymentMessage');
+        const paymentOkBtn = document.getElementById('paymentOkBtn');
+        const notificationsOkBtn = document.getElementById('notificationsOkBtn');
+
+        // Show toast notification
+        function showToast(message, type = 'success', duration = 3000) {
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Show modal
+        function showModal(modal) {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide modal
+        function hideModal(modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Get user initials from name
+        function getInitials(name) {
+            if (!name) return 'US';
+            
+            const names = name.split(' ');
+            let initials = names[0].substring(0, 1).toUpperCase();
+            
+            if (names.length > 1) {
+                initials += names[names.length - 1].substring(0, 1).toUpperCase();
+            }
+            
+            return initials;
+        }
+
+        // Get first name only
+        function getFirstName(fullName) {
+            if (!fullName) return 'User';
+            return fullName.split(' ')[0];
+        }
+
+        // Redirect to login if not authenticated
+        function checkAuthState(user) {
+            if (!user) {
+                showToast("Please login to continue", "error");
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return false;
+            }
+            return true;
+        }
+
+        // Fetch user data from Firestore
+        async function fetchUserData(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    
+                    // Update welcome message with first name only
+                    if (userData.name) {
+                        const firstName = getFirstName(userData.name);
+                        welcomeMessage.textContent = `Welcome back, ${firstName}!`;
+                    }
+                    
+                    // Update avatar with initials
+                    if (userData.name) {
+                        userAvatar.textContent = getInitials(userData.name);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        }
+
+        // Handle payment button click
+        makePaymentBtn.addEventListener('click', () => {
+            showModal(paymentModal);
+            
+            // Reset progress bar
+            paymentProgress.style.width = '0%';
+            paymentMessage.textContent = 'Processing your payment request...';
+            paymentOkBtn.style.display = 'none';
+            
+            // Simulate payment processing
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 1;
+                paymentProgress.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    paymentMessage.textContent = 'You have no loans to repay at this time.';
+                    paymentOkBtn.style.display = 'block';
+                }
+            }, 20); // 2 seconds total (100 steps * 20ms)
+        });
+
+        // Handle notifications button click
+        notificationsBtn.addEventListener('click', () => {
+            showModal(notificationsModal);
+        });
+
+        // Handle modal close buttons
+        paymentOkBtn.addEventListener('click', () => {
+            hideModal(paymentModal);
+        });
+
+        notificationsOkBtn.addEventListener('click', () => {
+            hideModal(notificationsModal);
+        });
+
+        // Close modals when clicking outside
+        [paymentModal, notificationsModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal(modal);
+                }
+            });
+        });
+
+        // Handle avatar click
+        userAvatar.addEventListener('click', () => {
+            window.location.href = 'profile.html';
+        });
+
+        // Auth state listener
+        auth.onAuthStateChanged((user) => {
+            if (checkAuthState(user)) {
+                // User is signed in, fetch their data
+                fetchUserData(user.uid);
+            }
+        });
+
+        // Check if there's a redirect message in session storage
+        document.addEventListener('DOMContentLoaded', () => {
+            const redirectMessage = sessionStorage.getItem('redirectMessage');
+            if (redirectMessage) {
+                const messageType = sessionStorage.getItem('redirectMessageType') || 'success';
+                showToast(redirectMessage, messageType, 5000);
+                sessionStorage.removeItem('redirectMessage');
+                sessionStorage.removeItem('redirectMessageType');
+            }
+        });
+    </script>
 </body>
 </html>

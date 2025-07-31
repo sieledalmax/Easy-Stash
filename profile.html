@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Easy Stash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        .back-button {
+            color: var(--primary-blue);
+            font-size: 20px;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 32px;
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .member-since {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .member-since i {
+            margin-right: 5px;
+            color: var(--primary-blue);
+        }
+
+        /* Profile Sections */
+        .profile-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary-blue);
+            font-size: 18px;
+        }
+
+        .profile-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Verification Status */
+        .verification-status {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .verified {
+            background-color: rgba(72, 207, 173, 0.2);
+            color: var(--success);
+        }
+
+        .unverified {
+            background-color: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+
+        /* Action Buttons */
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-edit {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-logout {
+            background-color: rgba(237, 85, 101, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(237, 85, 101, 0.3);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--darker-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        /* Responsive Tweaks */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="dashboard.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Easy Stash</h1>
+                </div>
+                <div style="width: 24px;"></div> <!-- Spacer for alignment -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">JD</div>
+            <h2 class="profile-name" id="profileName">John Doe</h2>
+            <div class="profile-email" id="profileEmail">john.doe@example.com</div>
+            <div class="member-since">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="memberSince">Member since January 2023</span>
+            </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="profile-section">
+            <h3 class="section-title">
+                <i class="fas fa-user-circle"></i>
+                Personal Information
+            </h3>
+            
+            <div class="profile-card">
+                <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value" id="fullName">John Doe</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone Number</span>
+                    <span class="info-value" id="phoneNumber">+1 (555) 123-4567</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date of Birth</span>
+                    <span class="info-value" id="dob">January 15, 1985</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Address</span>
+                    <span class="info-value" id="address">123 Main St, Apt 4B<br>New York, NY 10001</span>
+                </div>
+            </div>
+            
+            <button class="action-button btn-edit">
+                <i class="fas fa-pencil-alt"></i> Edit Personal Info
+            </button>
+        </div>
+
+        <!-- Account Security Section -->
+        <div class="profile-section">
+            <h3 class="section-title">
+                <i class="fas fa-shield-alt"></i>
+                Account Security
+            </h3>
+            
+            <div class="profile-card">
+                <div class="info-row">
+                    <span class="info-label">Email Address</span>
+                    <div>
+                        <span class="info-value" id="securityEmail">john.doe@example.com</span>
+                        <span class="verification-status">
+                            <span class="status-badge verified">Verified</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Password</span>
+                    <div>
+                        <span class="info-value">••••••••</span>
+                        <span class="verification-status">
+                            <span class="status-badge verified">Strong</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Two-Factor Auth</span>
+                    <div>
+                        <span class="info-value">Not Enabled</span>
+                        <span class="verification-status">
+                            <span class="status-badge unverified">Enable</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="action-button btn-edit">
+                <i class="fas fa-lock"></i> Update Security Settings
+            </button>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="profile-section">
+            <h3 class="section-title">
+                <i class="fas fa-file-alt"></i>
+                My Documents
+            </h3>
+            
+            <div class="profile-card">
+                <div class="info-row">
+                    <span class="info-label">ID Verification</span>
+                    <div>
+                        <span class="info-value">Driver's License</span>
+                        <span class="verification-status">
+                            <span class="status-badge verified">Approved</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Proof of Income</span>
+                    <div>
+                        <span class="info-value">Last 3 Pay Stubs</span>
+                        <span class="verification-status">
+                            <span class="status-badge verified">Approved</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Bank Statements</span>
+                    <div>
+                        <span class="info-value">Not Uploaded</span>
+                        <span class="verification-status">
+                            <span class="status-badge unverified">Required</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="action-button btn-edit">
+                <i class="fas fa-upload"></i> Upload Documents
+            </button>
+        </div>
+
+        <!-- Logout Button -->
+        <button id="logoutButton" class="action-button btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+        </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+       <a href="loan-application-1.html" class="nav-item">
+            <i class="fas fa-hand-holding-usd"></i>
+            <span>Loans</span>
+        </a>
+        <a href="calculator.html" class="nav-item">
+            <i class="fas fa-calculator"></i>
+            <span>Calculator</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span>Account</span>
+        </a>
+    </nav>
+
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.firebasestorage.app",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const profileAvatar = document.getElementById('profileAvatar');
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const fullName = document.getElementById('fullName');
+        const phoneNumber = document.getElementById('phoneNumber');
+        const dob = document.getElementById('dob');
+        const address = document.getElementById('address');
+        const securityEmail = document.getElementById('securityEmail');
+        const memberSince = document.getElementById('memberSince');
+        const logoutButton = document.getElementById('logoutButton');
+
+        // Get user initials from name
+        function getInitials(name) {
+            if (!name) return 'US';
+            
+            const names = name.split(' ');
+            let initials = names[0].substring(0, 1).toUpperCase();
+            
+            if (names.length > 1) {
+                initials += names[names.length - 1].substring(0, 1).toUpperCase();
+            }
+            
+            return initials;
+        }
+
+        // Format date to "Month YYYY"
+        function formatMemberSince(date) {
+            if (!date) return '';
+            
+            const options = { year: 'numeric', month: 'long' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Format date to "Month DD, YYYY"
+        function formatDOB(date) {
+            if (!date) return '';
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Fetch user data from Firestore
+        async function fetchUserData(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    
+                    // Update profile information
+                    if (userData.name) {
+                        profileName.textContent = userData.name;
+                        fullName.textContent = userData.name;
+                        profileAvatar.textContent = getInitials(userData.name);
+                    }
+                    
+                    if (userData.email) {
+                        profileEmail.textContent = userData.email;
+                        securityEmail.textContent = userData.email;
+                    }
+                    
+                    if (userData.phone) {
+                        phoneNumber.textContent = userData.phone;
+                    }
+                    
+                    if (userData.dob) {
+                        const dobDate = userData.dob.toDate();
+                        dob.textContent = formatDOB(dobDate);
+                    }
+                    
+                    if (userData.address) {
+                        address.textContent = userData.address;
+                    }
+                    
+                    if (userData.createdAt) {
+                        const joinDate = userData.createdAt.toDate();
+                        memberSince.textContent = `Member since ${formatMemberSince(joinDate)}`;
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        }
+
+        // Handle logout
+        logoutButton.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            }).catch((error) => {
+                console.error("Logout error:", error);
+                alert("Failed to log out. Please try again.");
+            });
+        });
+
+        // Auth state listener
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                // User is signed in, fetch their data
+                fetchUserData(user.uid);
+            }
+        });
+    </script>
+</body>
+</html>
