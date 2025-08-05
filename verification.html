@@ -299,77 +299,66 @@
             color: var(--primary-blue);
         }
 
-        /* Payment Form */
-        .payment-form .form-group {
-            margin-bottom: 20px;
-        }
-
-        .payment-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .payment-form .input-group {
-            position: relative;
-        }
-
-        .payment-form input {
+        /* Paystack Container */
+        #paystackEmbedContainer {
             width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background-color: var(--darker-bg);
-            color: var(--text-light);
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .payment-form input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
-
-        .payment-form .card-icon {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-            color: var(--text-muted);
-        }
-
-        .card-number-container {
-            position: relative;
-        }
-
-        .card-number-container .card-icon {
-            color: var(--text-light);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            min-width: 0; /* Prevent flex items from growing beyond container */
-        }
-
-        .payment-security {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 400px;
+            border: none;
             margin: 20px 0;
-            font-size: 13px;
-            color: var(--text-muted);
         }
 
-        .payment-security i {
+        /* Loading Spinner */
+        .spinner-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner-container.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(93, 156, 236, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            color: var(--text-light);
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Error Message */
+        .error-message {
+            color: var(--danger);
+            background-color: rgba(237, 85, 101, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message i {
             margin-right: 8px;
-            color: var(--success);
         }
 
         /* Footer */
@@ -380,21 +369,6 @@
             color: var(--text-muted);
             font-size: 12px;
             margin-top: auto;
-        }
-
-        /* Payment Providers */
-        .payment-providers {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .payment-providers img {
-            height: 24px;
-            filter: grayscale(100%) brightness(2);
-            opacity: 0.7;
         }
 
         /* Responsive */
@@ -413,26 +387,6 @@
 
             .payment-modal {
                 padding: 20px 15px;
-            }
-            
-            /* Keep form fields side by side on mobile */
-            .form-row {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding-bottom: 10px;
-                margin-right: -15px;
-                margin-left: -15px;
-                padding-left: 15px;
-                padding-right: 15px;
-            }
-            
-            .form-row .form-group {
-                flex: 0 0 150px; /* Fixed width for small screens */
-            }
-            
-            /* Hide scrollbar */
-            .form-row::-webkit-scrollbar {
-                display: none;
             }
         }
     </style>
@@ -476,7 +430,7 @@
                 <div class="benefit-item">
                     <div class="benefit-icon"><i class="fas fa-hand-holding-usd"></i></div>
                     <div class="benefit-text">
-                        <strong>You get it back:</strong> This $10.99 will be added to your loan balance and disbursed to you along with your approved loan amount.
+                        <strong>You'll get it back:</strong> This $10.99 will be added to your loan balance and disbursed to you along with your approved loan amount.
                     </div>
                 </div>
                 
@@ -503,8 +457,13 @@
     <div class="modal-overlay" id="paymentModal">
         <div class="payment-modal">
             <div class="modal-header">
-                <h3>Payment Details</h3>
+                <h3>Complete Your Payment</h3>
                 <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText"></span>
             </div>
             
             <div class="payment-amount">
@@ -512,125 +471,155 @@
                 <div class="amount">$10.99</div>
             </div>
             
-            <form class="payment-form" id="paymentForm">
-                <div class="form-group">
-                    <label for="cardNumber">Card Number</label>
-                    <div class="input-group card-number-container">
-                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
-                        <i class="far fa-credit-card card-icon" id="cardTypeIcon"></i>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="expiryDate">Expiry Date</label>
-                        <div class="input-group">
-                            <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cvv">CVV</label>
-                        <div class="input-group">
-                            <input type="text" id="cvv" placeholder="123" maxlength="4">
-                            <i class="fas fa-question-circle card-icon" title="3-digit code on back of card"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="payment-security">
-                    <i class="fas fa-lock"></i>
-                    <span>256-bit SSL Secured Payment | Your data is protected</span>
-                </div>
-                
-                <div class="payment-providers">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visa/visa-original.svg" alt="Visa">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mastercard/mastercard-original.svg" alt="Mastercard">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg" alt="Apple Pay">
-                </div>
-                
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-lock"></i> Pay Securely $10.99
-                </button>
-            </form>
+            <!-- Paystack payment form will be injected here -->
+            <div id="paystackEmbedContainer"></div>
+            
+            <div class="payment-security">
+                <i class="fas fa-lock"></i>
+                <span>256-bit SSL Secured Payment | Your data is protected</span>
+            </div>
         </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="spinner-container" id="spinner">
+        <div class="spinner"></div>
+        <div class="spinner-text">Processing payment...</div>
     </div>
 
     <footer class="footer">
         <p>© 2025 Easy Stash. All rights reserved. Licensed lender.</p>
     </footer>
 
+    <!-- Firebase & Paystack Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    
     <script>
-        // Payment Modal Toggle
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.firebasestorage.app",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Paystack test keys
+        const paystackPublicKey = 'pk_test_50f796e5105a79f318cf2e6edbf73da1d7ce8608';
+        const paystackSecretKey = 'sk_test_8332ad5284a52ce15b357f1dd1dc25fab66ecda4';
+
+        // DOM Elements
         const depositBtn = document.getElementById('depositBtn');
         const paymentModal = document.getElementById('paymentModal');
         const closeModal = document.getElementById('closeModal');
-        
-        depositBtn.addEventListener('click', () => {
-            paymentModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        const spinner = document.getElementById('spinner');
+        const paystackContainer = document.getElementById('paystackEmbedContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        // Payment Modal Toggle
+        depositBtn.addEventListener('click', async () => {
+            try {
+                spinner.classList.add('active');
+                
+                // Check if user is signed in
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error('User not authenticated. Please sign in.');
+                }
+                
+                // Get user email from Firebase Auth
+                const userEmail = user.email;
+                if (!userEmail) {
+                    throw new Error('No email found for this user.');
+                }
+                
+                // Initialize payment
+                initializePaystackPayment(userEmail);
+                
+                paymentModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                spinner.classList.remove('active');
+            } catch (error) {
+                spinner.classList.remove('active');
+                showError(error.message);
+            }
         });
         
         closeModal.addEventListener('click', () => {
             paymentModal.classList.remove('active');
             document.body.style.overflow = 'auto';
+            paystackContainer.innerHTML = ''; // Clear Paystack iframe
         });
-        
-        // Card Number Formatting and Type Detection
-        const cardNumber = document.getElementById('cardNumber');
-        const cardTypeIcon = document.getElementById('cardTypeIcon');
-        
-        cardNumber.addEventListener('input', (e) => {
-            // Format with spaces every 4 digits
-            let value = e.target.value.replace(/\s+/g, '');
-            if (value.length > 0) {
-                value = value.match(new RegExp('.{1,4}', 'g')).join(' ');
-            }
-            e.target.value = value;
+
+        // Initialize Paystack Payment
+        function initializePaystackPayment(userEmail) {
+            // Generate unique reference
+            const transactionRef = 'VS-' + Date.now();
             
-            // Detect card type and change icon
-            const firstDigit = value.charAt(0);
-            let cardType = 'credit-card';
+            const handler = PaystackPop.setup({
+                key: paystackPublicKey,
+                email: userEmail,
+                amount: 10.99 * 100, // $10.99 in kobo/cents
+                currency: 'USD',
+                ref: transactionRef,
+                container: 'paystackEmbedContainer',
+                channels: ['card'],
+                theme: {
+                    colors: {
+                        primary: '#5d9cec',
+                        secondary: '#4a89dc',
+                        background: '#0f3460',
+                        text: '#e6f2ff',
+                    }
+                },
+                callback: function(response) {
+                    // Payment successful
+                    spinner.classList.add('active');
+                    
+                    // In a real app, you would verify the payment on your server
+                    // For this demo, we'll redirect after a short delay
+                    setTimeout(() => {
+                        window.location.href = "dash.html";
+                    }, 1500);
+                },
+                onClose: function() {
+                    // User closed the payment modal
+                    paymentModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    paystackContainer.innerHTML = '';
+                }
+            });
             
-            if (/^4/.test(value)) {
-                cardType = 'cc-visa';
-            } else if (/^5[1-5]/.test(value)) {
-                cardType = 'cc-mastercard';
-            } else if (/^3[47]/.test(value)) {
-                cardType = 'cc-amex';
-            } else if (/^6(?:011|5)/.test(value)) {
-                cardType = 'cc-discover';
-            }
+            handler.openIframe();
+        }
+
+        // Show error message
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            cardTypeIcon.className = `fab fa-${cardType} card-icon`;
-        });
-        
-        // Expiry Date Formatting
-        const expiryDate = document.getElementById('expiryDate');
-        
-        expiryDate.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            // Hide error after 5 seconds
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // Check auth state on page load
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                showError('Please sign in to continue with verification.');
+                depositBtn.disabled = true;
             }
-            e.target.value = value;
-            
-            // Auto-tab to CVV when expiry date is complete
-            if (value.length === 5) {
-                document.getElementById('cvv').focus();
-            }
-        });
-        
-        // Form Submission
-        const paymentForm = document.getElementById('paymentForm');
-        
-        paymentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Here you would normally process the payment
-            alert('Payment processing would happen here in a real implementation');
-            paymentModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            // window.location.href = "verification-success.html";
         });
     </script>
 </body>

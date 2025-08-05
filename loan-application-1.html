@@ -40,7 +40,48 @@
             padding: 0 15px;
         }
 
-        /* Header */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
         .header {
             background-color: var(--darker-bg);
             padding: 15px 0;
@@ -72,7 +113,6 @@
             font-size: 20px;
         }
 
-        /* Progress Steps */
         .progress-steps {
             display: flex;
             justify-content: space-between;
@@ -141,7 +181,6 @@
             color: var(--text-light);
         }
 
-        /* Form Card */
         .form-card {
             background-color: var(--card-bg);
             border-radius: 12px;
@@ -189,16 +228,49 @@
             background-size: 15px;
         }
 
-        .range-slider {
-            width: 100%;
-            margin: 20px 0 10px;
+        .amount-input-container {
+            position: relative;
         }
 
-        .range-values {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-muted);
+        .amount-input-container::before {
+            content: '$';
+            position: absolute;
+            left: 14px;
+            top: 14px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        #loan-amount {
+            padding-left: 28px;
+        }
+
+        .term-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .term-option {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: var(--darker-bg);
+            font-size: 14px;
+        }
+
+        .term-option:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .term-option.active {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
         }
 
         .btn {
@@ -230,7 +302,6 @@
             cursor: not-allowed;
         }
 
-        /* User Info */
         .user-info {
             display: flex;
             align-items: center;
@@ -263,7 +334,13 @@
             color: var(--text-muted);
         }
 
-        /* Footer */
+        .error-message {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
         .footer-text {
             text-align: center;
             font-size: 12px;
@@ -275,9 +352,124 @@
             color: var(--primary-blue);
             text-decoration: none;
         }
+
+        /* Enhanced Category Styles */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            background: var(--darker-bg);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .category-tab {
+            padding: 12px 18px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+        }
+
+        .category-tab.active {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(93, 156, 236, 0.3);
+        }
+
+        .category-tab i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .purpose-options {
+            display: none;
+            background: rgba(30, 41, 62, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--primary-blue);
+        }
+
+        .purpose-options.active {
+            display: block;
+        }
+
+        .purpose-options h4 {
+            color: var(--primary-blue);
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .purpose-option-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .purpose-option {
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: var(--darker-bg);
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .purpose-option i {
+            margin-right: 8px;
+            font-size: 14px;
+            color: var(--primary-blue);
+        }
+
+        .purpose-option:hover {
+            border-color: var(--primary-blue);
+            background-color: rgba(93, 156, 236, 0.1);
+        }
+
+        .purpose-option.active {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+
+        .purpose-option.active i {
+            color: white;
+        }
+
+        .amount-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: none;
+            font-style: italic;
+        }
+
+        .amount-hint.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing your information...</div>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -309,11 +501,11 @@
         </div>
 
         <!-- User Info -->
-        <div class="user-info">
+        <div class="user-info" id="userInfo">
             <div class="user-avatar">JD</div>
             <div class="user-details">
-                <h4>John Doe</h4>
-                <p>john.doe@example.com</p>
+                <h4 id="userName">John Doe</h4>
+                <p id="userEmail">john.doe@example.com</p>
             </div>
         </div>
 
@@ -322,50 +514,116 @@
             <h3 class="form-title">What type of loan do you need?</h3>
 
             <div class="form-group">
-                <label for="loan-purpose">Loan Purpose</label>
-                <select id="loan-purpose" class="form-control">
-                    <option value="" disabled selected>Select purpose</option>
-                    <option>Debt consolidation</option>
-                    <option>Home improvement</option>
-                    <option>Medical expenses</option>
-                    <option>Auto purchase</option>
-                    <option>Business investment</option>
-                    <option>Other</option>
-                </select>
+                <label>Loan Category</label>
+                <div class="category-tabs">
+                    <div class="category-tab active" data-category="everyday" data-min="100" data-max="5000">
+                        <i class="fas fa-shopping-basket"></i> Everyday
+                    </div>
+                    <div class="category-tab" data-category="major" data-min="1000" data-max="14900">
+                        <i class="fas fa-home"></i> Major
+                    </div>
+                    <div class="category-tab" data-category="emergency" data-min="500" data-max="10000">
+                        <i class="fas fa-ambulance"></i> Emergency
+                    </div>
+                </div>
+
+                <div class="purpose-options active" id="everydayOptions">
+                    <h4>Everyday Needs</h4>
+                    <div class="purpose-option-grid">
+                        <div class="purpose-option" data-purpose="Debt consolidation">
+                            <i class="fas fa-credit-card"></i> Debt Consolidation
+                        </div>
+                        <div class="purpose-option" data-purpose="Medical expenses">
+                            <i class="fas fa-heartbeat"></i> Medical Bills
+                        </div>
+                        <div class="purpose-option" data-purpose="Utility bills">
+                            <i class="fas fa-bolt"></i> Utilities
+                        </div>
+                        <div class="purpose-option" data-purpose="Education">
+                            <i class="fas fa-graduation-cap"></i> Education
+                        </div>
+                    </div>
+                    <div class="amount-hint active" id="everydayHint">
+                        Typical amounts: $100 - $5,000
+                    </div>
+                </div>
+
+                <div class="purpose-options" id="majorOptions">
+                    <h4>Major Purchases</h4>
+                    <div class="purpose-option-grid">
+                        <div class="purpose-option" data-purpose="Home improvement">
+                            <i class="fas fa-hammer"></i> Home Repair
+                        </div>
+                        <div class="purpose-option" data-purpose="Auto purchase">
+                            <i class="fas fa-car"></i> Vehicle
+                        </div>
+                        <div class="purpose-option" data-purpose="Appliances">
+                            <i class="fas fa-blender"></i> Appliances
+                        </div>
+                        <div class="purpose-option" data-purpose="Electronics">
+                            <i class="fas fa-laptop"></i> Electronics
+                        </div>
+                    </div>
+                    <div class="amount-hint" id="majorHint">
+                        Typical amounts: $1,000 - $14,900
+                    </div>
+                </div>
+
+                <div class="purpose-options" id="emergencyOptions">
+                    <h4>Emergency Needs</h4>
+                    <div class="purpose-option-grid">
+                        <div class="purpose-option" data-purpose="Emergency medical">
+                            <i class="fas fa-procedures"></i> Medical Emergency
+                        </div>
+                        <div class="purpose-option" data-purpose="Car repairs">
+                            <i class="fas fa-tools"></i> Urgent Repairs
+                        </div>
+                        <div class="purpose-option" data-purpose="Family emergency">
+                            <i class="fas fa-user-friends"></i> Family Emergency
+                        </div>
+                        <div class="purpose-option" data-purpose="Other emergency">
+                            <i class="fas fa-exclamation-triangle"></i> Other
+                        </div>
+                    </div>
+                    <div class="amount-hint" id="emergencyHint">
+                        Typical amounts: $500 - $10,000
+                    </div>
+                </div>
+                <div class="error-message" id="purpose-error">Please select a loan purpose</div>
             </div>
 
             <div class="form-group">
                 <label for="loan-amount">Loan Amount</label>
-                <input type="range" id="loan-amount" min="1000" max="50000" step="100" value="10000" class="range-slider">
-                <div class="range-values">
-                    <span>$1,000</span>
-                    <span>$50,000</span>
+                <div class="amount-input-container">
+                    <input type="number" id="loan-amount" class="form-control" placeholder="500" min="100" max="14900">
                 </div>
-                <input type="number" id="amount-display" class="form-control" value="10000" style="margin-top: 10px;">
+                <div class="error-message" id="amount-error">Please enter an amount between $100 and $14,900</div>
+            </div>
+
+            <div class="form-group">
+                <label>Loan Term</label>
+                <div class="term-options">
+                    <div class="term-option active" data-term="2 weeks">2 Weeks</div>
+                    <div class="term-option" data-term="1 month">1 Month</div>
+                    <div class="term-option" data-term="3 months">3 Months</div>
+                    <div class="term-option" data-term="6 months">6 Months</div>
+                    <div class="term-option" data-term="9 months">9 Months</div>
+                    <div class="term-option" data-term="12 months">12 Months</div>
+                </div>
+                <div class="error-message" id="term-error">Please select a loan term</div>
             </div>
 
             <div class="form-group">
                 <label for="credit-score">Estimated Credit Score</label>
-                <select id="credit-score" class="form-control">
+                <select id="credit-score" class="form-control" required>
                     <option value="" disabled selected>Select range</option>
-                    <option>Excellent (720+)</option>
-                    <option>Good (680-719)</option>
-                    <option>Fair (640-679)</option>
-                    <option>Poor (639 or below)</option>
-                    <option>I don't know</option>
+                    <option value="Excellent (720+)">Excellent (720+)</option>
+                    <option value="Good (680-719)">Good (680-719)</option>
+                    <option value="Fair (640-679)">Fair (640-679)</option>
+                    <option value="Poor (639 or below)">Poor (639 or below)</option>
+                    <option value="I don't know">I don't know</option>
                 </select>
-            </div>
-
-            <div class="form-group">
-                <label for="loan-term">Loan Term</label>
-                <select id="loan-term" class="form-control">
-                    <option value="" disabled selected>Select term</option>
-                    <option>12 months</option>
-                    <option>24 months</option>
-                    <option>36 months</option>
-                    <option>48 months</option>
-                    <option>60 months</option>
-                </select>
+                <div class="error-message" id="credit-error">Please select your credit score range</div>
             </div>
         </div>
 
@@ -377,27 +635,252 @@
         </p>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
     <script>
-        // Update amount display when slider changes
-        document.getElementById('loan-amount').addEventListener('input', function() {
-            document.getElementById('amount-display').value = this.value;
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.appspot.com",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const continueBtn = document.getElementById('continue-btn');
+        const loanAmount = document.getElementById('loan-amount');
+        const creditScore = document.getElementById('credit-score');
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const userAvatar = document.querySelector('.user-avatar');
+
+        // Error elements
+        const purposeError = document.getElementById('purpose-error');
+        const amountError = document.getElementById('amount-error');
+        const creditError = document.getElementById('credit-error');
+        const termError = document.getElementById('term-error');
+
+        // Category and purpose elements
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const purposeOptions = document.querySelectorAll('.purpose-option');
+        const termOptions = document.querySelectorAll('.term-option');
+
+        // Selected values
+        let selectedCategory = 'everyday';
+        let selectedPurpose = '';
+        let selectedTerm = '2 weeks';
+
+        // Show loading overlay
+        function showLoading() {
+            loadingOverlay.classList.add('active');
+        }
+
+        // Hide loading overlay
+        function hideLoading() {
+            loadingOverlay.classList.remove('active');
+        }
+
+        // Get user initials from name
+        function getInitials(name) {
+            if (!name) return 'US';
+            
+            const names = name.split(' ');
+            let initials = names[0].substring(0, 1).toUpperCase();
+            
+            if (names.length > 1) {
+                initials += names[names.length - 1].substring(0, 1).toUpperCase();
+            }
+            
+            return initials;
+        }
+
+        // Validate form inputs
+        function validateForm() {
+            let isValid = true;
+
+            // Reset errors
+            purposeError.style.display = 'none';
+            amountError.style.display = 'none';
+            creditError.style.display = 'none';
+            termError.style.display = 'none';
+
+            // Validate loan purpose
+            if (!selectedPurpose) {
+                purposeError.style.display = 'block';
+                isValid = false;
+            }
+
+            // Validate loan amount
+            const amount = parseInt(loanAmount.value);
+            if (isNaN(amount)) {
+                amountError.style.display = 'block';
+                isValid = false;
+            } else {
+                // Get current category limits
+                const activeTab = document.querySelector('.category-tab.active');
+                const minAmount = parseInt(activeTab.dataset.min);
+                const maxAmount = parseInt(activeTab.dataset.max);
+                
+                if (amount < minAmount || amount > maxAmount) {
+                    amountError.textContent = `Please enter an amount between $${minAmount} and $${maxAmount}`;
+                    amountError.style.display = 'block';
+                    isValid = false;
+                }
+            }
+
+            // Validate credit score
+            if (!creditScore.value) {
+                creditError.style.display = 'block';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Category tab click handler
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Get category and limits
+                selectedCategory = this.dataset.category;
+                const minAmount = this.dataset.min;
+                const maxAmount = this.dataset.max;
+                
+                // Update amount input limits
+                loanAmount.min = minAmount;
+                loanAmount.max = maxAmount;
+                loanAmount.placeholder = minAmount;
+                
+                // Hide all purpose options and hints
+                document.querySelectorAll('.purpose-options, .amount-hint').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                // Show selected category options and hint
+                document.getElementById(`${selectedCategory}Options`).classList.add('active');
+                document.getElementById(`${selectedCategory}Hint`).classList.add('active');
+                
+                // Reset selected purpose
+                selectedPurpose = '';
+                purposeOptions.forEach(opt => opt.classList.remove('active'));
+            });
         });
 
-        // Update slider when amount display changes
-        document.getElementById('amount-display').addEventListener('input', function() {
-            const slider = document.getElementById('loan-amount');
-            let value = parseInt(this.value);
-            
-            if (value < 1000) value = 1000;
-            if (value > 50000) value = 50000;
-            
-            slider.value = value;
-            this.value = value;
+        // Purpose option click handler
+        purposeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options in this category
+                const parentId = this.closest('.purpose-options').id;
+                document.querySelectorAll(`#${parentId} .purpose-option`).forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+                selectedPurpose = this.dataset.purpose;
+            });
         });
 
-        // Simple navigation
-        document.getElementById('continue-btn').addEventListener('click', function() {
-            window.location.href = 'loan-application-2.html';
+        // Term option click handler
+        termOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                termOptions.forEach(opt => opt.classList.remove('active'));
+                
+                // Add active class to clicked option
+                this.classList.add('active');
+                selectedTerm = this.dataset.term;
+            });
+        });
+
+        // Continue button click handler
+        continueBtn.addEventListener('click', async function() {
+            if (!validateForm()) return;
+
+            showLoading();
+
+            // Save form data to session storage
+            const formData = {
+                loanCategory: selectedCategory,
+                loanPurpose: selectedPurpose,
+                loanAmount: loanAmount.value,
+                creditScore: creditScore.value,
+                loanTerm: selectedTerm
+            };
+            
+            sessionStorage.setItem('loanApplication', JSON.stringify(formData));
+
+            // Simulate processing delay
+            setTimeout(() => {
+                window.location.href = 'loan-application-2.html';
+            }, 1500);
+        });
+
+        // Auth state listener
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, fetch their data
+                userEmail.textContent = user.email;
+                
+                // Try to get user data from Firestore
+                db.collection('users').doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        if (userData.name) {
+                            userName.textContent = userData.name;
+                            userAvatar.textContent = getInitials(userData.name);
+                        }
+                    }
+                }).catch((error) => {
+                    console.error("Error fetching user data:", error);
+                });
+
+                // Check if there's saved form data
+                const savedData = sessionStorage.getItem('loanApplication');
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    
+                    // Set category and purpose
+                    if (formData.loanCategory) {
+                        document.querySelector(`.category-tab[data-category="${formData.loanCategory}"]`).click();
+                        
+                        if (formData.loanPurpose) {
+                            setTimeout(() => {
+                                const purposeOption = document.querySelector(`.purpose-option[data-purpose="${formData.loanPurpose}"]`);
+                                if (purposeOption) purposeOption.click();
+                            }, 100);
+                        }
+                    }
+                    
+                    // Set other fields
+                    if (formData.loanAmount) loanAmount.value = formData.loanAmount;
+                    if (formData.creditScore) creditScore.value = formData.creditScore;
+                    if (formData.loanTerm) {
+                        document.querySelector(`.term-option[data-term="${formData.loanTerm}"]`).click();
+                    }
+                }
+            } else {
+                // User is not signed in, redirect to login
+                sessionStorage.setItem('redirectMessage', 'Please login to apply for a loan');
+                sessionStorage.setItem('redirectMessageType', 'error');
+                window.location.href = 'login.html';
+            }
         });
     </script>
 </body>
