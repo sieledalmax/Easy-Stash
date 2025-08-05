@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Review Application | Easy Stash</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add Paystack inline script -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     <style>
         :root {
             --primary-blue: #5d9cec;
@@ -235,6 +237,71 @@
             margin: 10px 0;
         }
 
+        /* Processing Speed Options */
+        .processing-options {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .processing-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--primary-blue);
+        }
+
+        .speed-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .speed-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .speed-option:hover {
+            background-color: rgba(93, 156, 236, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .speed-option.active {
+            background-color: rgba(93, 156, 236, 0.2);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(93, 156, 236, 0.3);
+        }
+
+        .speed-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .speed-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .speed-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .speed-fee {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
         /* Buttons */
         .button-group {
             display: flex;
@@ -274,6 +341,68 @@
             color: var(--text-muted);
             margin-top: 20px;
         }
+
+        /* Payment Modal */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-modal-content {
+            background-color: var(--darker-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .payment-modal h3 {
+            margin-bottom: 20px;
+            color: var(--primary-blue);
+        }
+
+        .payment-modal p {
+            margin-bottom: 25px;
+        }
+
+        .payment-modal .btn {
+            margin-top: 20px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -290,7 +419,6 @@
     </header>
 
     <div class="container">
-
         <!-- Progress Steps -->
         <div class="progress-steps">
             <div class="progress-bar"></div>
@@ -368,6 +496,43 @@
             </div>
         </div>
 
+        <!-- Processing Speed Options -->
+        <div class="processing-options">
+            <h3 class="processing-title">Select Processing Speed</h3>
+            <div class="speed-options">
+                <div class="speed-option" data-speed="same-day" data-fee="10.99">
+                    <div class="speed-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="speed-info">
+                        <div class="speed-name">Same Day Processing</div>
+                        <div class="speed-desc">Funds deposited in less than 24hrs</div>
+                    </div>
+                    <div class="speed-fee">$10.99</div>
+                </div>
+                <div class="speed-option active" data-speed="next-day" data-fee="3.99">
+                    <div class="speed-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="speed-info">
+                        <div class="speed-name">Next Business Day</div>
+                        <div class="speed-desc">Funds deposited within 48hrs</div>
+                    </div>
+                    <div class="speed-fee">$3.99</div>
+                </div>
+                <div class="speed-option" data-speed="standard" data-fee="1.99">
+                    <div class="speed-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="speed-info">
+                        <div class="speed-name">Standard (3 Business Days)</div>
+                        <div class="speed-desc">Funds deposited within 3 business days</div>
+                    </div>
+                    <div class="speed-fee">$1.99</div>
+                </div>
+            </div>
+        </div>
+
         <div class="button-group">
             <button class="btn btn-outline" id="backBtn">Back</button>
             <button class="btn btn-primary" id="submitBtn">Submit Application</button>
@@ -375,7 +540,20 @@
 
         <p class="footer-text">
             Your information is secured with 256-bit encryption. We'll perform a soft credit check.
+            Processing fees will be deducted from your loan amount upon disbursement.
         </p>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h3>Pay Processing Fee</h3>
+            <p>Please complete payment of <span id="processingFeeAmount">$0.00</span> to submit your application.</p>
+            <div id="paystackEmbedContainer"></div>
+            <div class="spinner" id="paymentSpinner"></div>
+            <p id="paymentStatus"></p>
+        </div>
     </div>
 
     <!-- Firebase SDKs -->
@@ -399,6 +577,10 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Paystack configuration
+        const paystackPublicKey = 'pk_test_50f796e5105a79f318cf2e6edbf73da1d7ce8608';
+        const paystackSecretKey = 'sk_test_8332ad5284a52ce15b357f1dd1dc25fab66ecda4';
 
         // Get user initials from name
         function getInitials(name) {
@@ -485,6 +667,54 @@
             }
         }
 
+        // Initialize Paystack payment
+        function initializePaystackPayment(email, amount, callback) {
+            const handler = PaystackPop.setup({
+                key: paystackPublicKey,
+                email: email,
+                amount: amount * 100, // Paystack amount is in kobo (multiply by 100)
+                currency: 'USD',
+                ref: 'ES-' + Math.floor(Math.random() * 1000000000 + 1),
+                onClose: function() {
+                    callback('Payment window closed', null);
+                },
+                callback: function(response) {
+                    callback(null, response);
+                }
+            });
+            handler.openIframe();
+        }
+
+        // Submit application to Firestore
+        async function submitApplication(user, paymentReference = null) {
+            const appData = JSON.parse(sessionStorage.getItem('loanApplication')) || {};
+            
+            // Get selected processing option
+            const selectedOption = document.querySelector('.speed-option.active');
+            if (selectedOption) {
+                appData.processingSpeed = selectedOption.dataset.speed;
+                appData.processingFee = selectedOption.dataset.fee;
+            }
+            
+            // Add user ID, timestamp, and payment reference
+            appData.userId = user.uid;
+            appData.submittedAt = new Date().toISOString();
+            appData.status = 'pending';
+            if (paymentReference) {
+                appData.paymentReference = paymentReference;
+                appData.paymentStatus = 'completed';
+            }
+            
+            try {
+                // Save to Firestore
+                await db.collection('loanApplications').add(appData);
+                window.location.href = 'review.html';
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                throw error;
+            }
+        }
+
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             // Check auth state
@@ -515,36 +745,103 @@
                 }
             });
 
+            // Handle processing speed selection
+            const speedOptions = document.querySelectorAll('.speed-option');
+            speedOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    speedOptions.forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to selected option
+                    this.classList.add('active');
+                    
+                    // Store selection in session storage
+                    const selectedSpeed = this.dataset.speed;
+                    const selectedFee = this.dataset.fee;
+                    
+                    let appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
+                    appData.processingSpeed = selectedSpeed;
+                    appData.processingFee = selectedFee;
+                    sessionStorage.setItem('loanApplication', JSON.stringify(appData));
+                });
+            });
+
+            // Modal controls
+            const paymentModal = document.getElementById('paymentModal');
+            const closeModal = document.getElementById('closeModal');
+            const processingFeeAmount = document.getElementById('processingFeeAmount');
+            const paymentSpinner = document.getElementById('paymentSpinner');
+            const paymentStatus = document.getElementById('paymentStatus');
+
+            closeModal.addEventListener('click', function() {
+                paymentModal.style.display = 'none';
+            });
+
             // Button event listeners
             document.getElementById('backBtn').addEventListener('click', function() {
                 window.location.href = 'loan-application-2.html';
             });
             
-            document.getElementById('submitBtn').addEventListener('click', function() {
+            document.getElementById('submitBtn').addEventListener('click', async function() {
                 const user = auth.currentUser;
                 if (!user) {
                     alert('Please sign in to submit your application');
                     return;
                 }
 
-                const appData = JSON.parse(sessionStorage.getItem('loanApplication') )|| {};
-                
-                // Add user ID and timestamp
-                appData.userId = user.uid;
-                appData.submittedAt = new Date().toISOString();
-                appData.status = 'pending';
-                
-                // Save to Firestore
-                db.collection('loanApplications').add(appData)
-                    .then(() => {
-                        /*alert('Application submitted successfully!');
-                        sessionStorage.removeItem('loanApplication');*/
-                        window.location.href = 'verification.html';
-                    })
-                    .catch((error) => {
-                        console.error('Error submitting application:', error);
-                        alert('There was an error submitting your application. Please try again.');
+                // Get selected processing option
+                const selectedOption = document.querySelector('.speed-option.active');
+                if (!selectedOption) {
+                    alert('Please select a processing speed option');
+                    return;
+                }
+
+                const processingFee = parseFloat(selectedOption.dataset.fee);
+                processingFeeAmount.textContent = formatCurrency(processingFee);
+
+                // Show payment modal
+                paymentModal.style.display = 'flex';
+                paymentStatus.textContent = '';
+                paymentSpinner.style.display = 'none';
+
+                try {
+                    // Initialize Paystack payment
+                    initializePaystackPayment(user.email, processingFee, async (error, response) => {
+                        if (error) {
+                            paymentStatus.textContent = error;
+                            paymentStatus.style.color = 'var(--danger)';
+                            return;
+                        }
+
+                        // Payment successful
+                        paymentSpinner.style.display = 'block';
+                        paymentStatus.textContent = 'Payment successful! Submitting your application...';
+                        paymentStatus.style.color = 'var(--success)';
+
+                        try {
+                            // Submit application with payment reference
+                            await submitApplication(user, response.reference);
+                        } catch (submitError) {
+                            paymentSpinner.style.display = 'none';
+                            paymentStatus.textContent = 'Application submission failed. Please contact support.';
+                            paymentStatus.style.color = 'var(--danger)';
+                            console.error('Submission error:', submitError);
+                        }
                     });
+                } catch (paymentError) {
+                    paymentStatus.textContent = 'Error initializing payment. Please try again.';
+                    paymentStatus.style.color = 'var(--danger)';
+                    console.error('Payment error:', paymentError);
+                }
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === paymentModal) {
+                    paymentModal.style.display = 'none';
+                }
             });
         });
     </script>
