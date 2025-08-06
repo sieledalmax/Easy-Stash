@@ -403,6 +403,43 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-blue);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
     </style>
 </head>
 <body>
@@ -417,6 +454,11 @@
             </div>
         </div>
     </header>
+
+    <!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
 
     <div class="container">
         <!-- Progress Steps -->
@@ -562,59 +604,196 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
-            authDomain: "easy-stash.firebaseapp.com",
-            projectId: "easy-stash",
-            storageBucket: "easy-stash.appspot.com",
-            messagingSenderId: "12483019",
-            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
-            measurementId: "G-FPK26FLF7V"
-        };
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+        authDomain: "easy-stash.firebaseapp.com",
+        projectId: "easy-stash",
+        storageBucket: "easy-stash.appspot.com",
+        messagingSenderId: "12483019",
+        appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+        measurementId: "G-FPK26FLF7V"
+    };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        // Paystack configuration
-        const paystackPublicKey = 'pk_test_50f796e5105a79f318cf2e6edbf73da1d7ce8608';
-        const paystackSecretKey = 'sk_test_8332ad5284a52ce15b357f1dd1dc25fab66ecda4';
+    // Paystack configuration
+    const paystackPublicKey = 'pk_test_50f796e5105a79f318cf2e6edbf73da1d7ce8608';
 
-        // Get user initials from name
-        function getInitials(name) {
-            if (!name) return 'US';
+    // Show loading overlay
+    function showLoading() {
+        document.getElementById('loadingOverlay').classList.add('active');
+    }
+
+    // Hide loading overlay
+    function hideLoading() {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    // Get user initials from name
+    function getInitials(name) {
+        if (!name) return 'US';
+        const names = name.split(' ');
+        let initials = names[0].substring(0, 1).toUpperCase();
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
+        }
+        return initials;
+    }
+
+    // Format currency
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(amount);
+    }
+
+    // Calculate monthly payment
+    function calculateMonthlyPayment(amount, term) {
+        const termMatch = term.match(/\d+/);
+        const termMonths = termMatch ? parseInt(termMatch[0]) : 0;
+        if (termMonths === 0) return 0;
+        return amount / termMonths;
+    }
+
+    // Clean up old applications (keep only 3 most recent)
+    async function cleanupOldApplications(userId, currentAppId) {
+        try {
+            const querySnapshot = await db.collection('loanApplications')
+                .where('userId', '==', userId)
+                .where('status', '==', 'pending')
+                .orderBy('createdAt', 'desc')
+                .get();
+
+            // Filter out current application and get only older ones
+            const oldApplications = querySnapshot.docs.filter(doc => doc.id !== currentAppId);
             
-            const names = name.split(' ');
-            let initials = names[0].substring(0, 1).toUpperCase();
-            
-            if (names.length > 1) {
-                initials += names[names.length - 1].substring(0, 1).toUpperCase();
+            if (oldApplications.length > 2) { // Keep 2 old + current = 3 total
+                const batch = db.batch();
+                const docsToDelete = oldApplications.slice(2);
+                
+                docsToDelete.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                console.log(`Deleted ${docsToDelete.length} old applications`);
+            }
+        } catch (error) {
+            console.error('Error cleaning up old applications:', error);
+        }
+    }
+
+    // Save pending application
+    async function savePendingApplication(user, appData) {
+        showLoading();
+        try {
+            const selectedOption = document.querySelector('.speed-option.active');
+            if (selectedOption) {
+                appData.processingSpeed = selectedOption.dataset.speed;
+                appData.processingFee = selectedOption.dataset.fee;
             }
             
-            return initials;
+            appData.userId = user.uid;
+            appData.updatedAt = new Date().toISOString();
+            
+            let docId = sessionStorage.getItem('currentLoanApplicationId');
+            let isNewApplication = false;
+            
+            if (docId) {
+                await db.collection('loanApplications').doc(docId).update(appData);
+                console.log("Updated existing application:", docId);
+            } else {
+                appData.createdAt = new Date().toISOString();
+                appData.status = 'pending';
+                const docRef = await db.collection('loanApplications').add(appData);
+                docId = docRef.id;
+                sessionStorage.setItem('currentLoanApplicationId', docId);
+                console.log("Created new application:", docId);
+                isNewApplication = true;
+            }
+            
+            // Only clean up if this is a new application
+            if (isNewApplication) {
+                await cleanupOldApplications(user.uid, docId);
+            }
+            
+            return docId;
+        } catch (error) {
+            console.error('Error saving pending application:', error);
+            throw error;
+        } finally {
+            hideLoading();
         }
+    }
 
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD'
-            }).format(amount);
+    // Update application status after payment
+    async function updateApplicationStatus(docId, paymentReference) {
+        showLoading();
+        try {
+            await db.collection('loanApplications').doc(docId).update({
+                status: 'active',
+                paymentReference: paymentReference,
+                paymentStatus: 'completed',
+                updatedAt: new Date().toISOString(),
+                activatedAt: new Date().toISOString()
+            });
+            
+            sessionStorage.removeItem('currentLoanApplicationId');
+            sessionStorage.removeItem('loanApplication');
+            
+            return true;
+        } catch (error) {
+            console.error('Error updating application status:', error);
+            throw error;
+        } finally {
+            hideLoading();
         }
+    }
 
-        // Calculate monthly payment (simplified)
-        function calculateMonthlyPayment(amount, term) {
-            const termMatch = term.match(/\d+/);
-            const termMonths = termMatch ? parseInt(termMatch[0]) : 0;
-            if (termMonths === 0) return 0;
-            return amount / termMonths;
-        }
+    // Initialize Paystack payment
+    function initializePaystackPayment(email, amount, callback) {
+        const handler = PaystackPop.setup({
+            key: paystackPublicKey,
+            email: email,
+            amount: amount * 100,
+            currency: 'USD',
+            ref: 'ES-' + Math.floor(Math.random() * 1000000000 + 1),
+            onClose: function() {
+                callback('Payment window closed', null);
+            },
+            callback: function(response) {
+                callback(null, response);
+            }
+        });
+        handler.openIframe();
+    }
 
-        // Load and display application data
-        function loadApplicationData(user) {
-            const appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
+    // Load and display application data
+    async function loadApplicationData(user) {
+        showLoading();
+        
+        try {
+            let appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
+            
+            if (Object.keys(appData).length === 0) {
+                const loanId = sessionStorage.getItem('currentLoanApplicationId');
+                if (loanId) {
+                    const doc = await db.collection('loanApplications').doc(loanId).get();
+                    if (doc.exists) {
+                        appData = doc.data();
+                        sessionStorage.setItem('loanApplication', JSON.stringify(appData));
+                    }
+                }
+            }
+            
+            if (Object.keys(appData).length === 0) {
+                throw new Error("No application data found");
+            }
             
             // Display loan details
             if (appData.loanPurpose) {
@@ -631,7 +810,6 @@
                 document.getElementById('reviewTerm').textContent = appData.loanTerm;
                 document.getElementById('offerTerm').textContent = `Term: ${appData.loanTerm}`;
                 
-                // Calculate monthly payment
                 if (appData.loanAmount) {
                     const monthly = calculateMonthlyPayment(
                         parseFloat(appData.loanAmount),
@@ -665,185 +843,189 @@
                 document.getElementById('reviewIncome').textContent = 
                     formatCurrency(parseFloat(appData.income));
             }
-        }
-
-        // Initialize Paystack payment
-        function initializePaystackPayment(email, amount, callback) {
-            const handler = PaystackPop.setup({
-                key: paystackPublicKey,
-                email: email,
-                amount: amount * 100, // Paystack amount is in kobo (multiply by 100)
-                currency: 'USD',
-                ref: 'ES-' + Math.floor(Math.random() * 1000000000 + 1),
-                onClose: function() {
-                    callback('Payment window closed', null);
-                },
-                callback: function(response) {
-                    callback(null, response);
+            
+            // Set processing speed from data if available
+            if (appData.processingSpeed) {
+                const speedOption = document.querySelector(`.speed-option[data-speed="${appData.processingSpeed}"]`);
+                if (speedOption) {
+                    document.querySelectorAll('.speed-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    speedOption.classList.add('active');
                 }
-            });
-            handler.openIframe();
-        }
+            }
+            
 
-        // Submit application to Firestore
-        async function submitApplication(user, paymentReference = null) {
-            const appData = JSON.parse(sessionStorage.getItem('loanApplication')) || {};
-            
-            // Get selected processing option
-            const selectedOption = document.querySelector('.speed-option.active');
-            if (selectedOption) {
-                appData.processingSpeed = selectedOption.dataset.speed;
-                appData.processingFee = selectedOption.dataset.fee;
-            }
-            
-            // Add user ID, timestamp, and payment reference
-            appData.userId = user.uid;
-            appData.submittedAt = new Date().toISOString();
-            appData.status = 'pending';
-            if (paymentReference) {
-                appData.paymentReference = paymentReference;
-                appData.paymentStatus = 'completed';
-            }
-            
-            try {
-                // Save to Firestore
-                await db.collection('loanApplications').add(appData);
-                window.location.href = 'review.html';
-            } catch (error) {
-                console.error('Error submitting application:', error);
-                throw error;
-            }
-        }
+// ✅ SAVE the loaded appData to Firestore
+await savePendingApplication(user, appData);
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check auth state
-            auth.onAuthStateChanged((user) => {
-                if (user) {
+            
+        } catch (error) {
+            console.error('Error loading application data:', error);
+            
+            // Show error to user
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'error-message';
+            errorContainer.innerHTML = `
+                <p style="color: var(--danger);">Error loading application: ${error.message}</p>
+                <button class="btn btn-primary" onclick="window.location.reload()">Retry</button>
+            `;
+            document.querySelector('.review-summary').prepend(errorContainer);
+            
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check auth state
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                showLoading();
+                try {
                     // User is signed in, display info
                     document.getElementById('userEmail').textContent = user.email;
                     
                     // Try to get user data from Firestore
-                    db.collection('users').doc(user.uid).get().then((doc) => {
-                        if (doc.exists) {
-                            const userData = doc.data();
-                            if (userData.name) {
-                                document.getElementById('userName').textContent = userData.name;
-                                document.getElementById('userAvatar').textContent = 
-                                    getInitials(userData.name);
-                            }
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        if (userData.name) {
+                            document.getElementById('userName').textContent = userData.name;
+                            document.getElementById('userAvatar').textContent = 
+                                getInitials(userData.name);
                         }
-                        // Load application data
+                    }
+                    
+                    // Load application data
+                    await loadApplicationData(user);
+                    
+                } catch (error) {
+                    console.error("Error initializing page:", error);
+                    // Fallback to session storage if Firestore fails
+                    const appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
+                    if (Object.keys(appData).length > 0) {
                         loadApplicationData(user);
-                    }).catch((error) => {
-                        console.error("Error fetching user data:", error);
-                        loadApplicationData(user);
-                    });
-                } else {
-                    // User is not signed in, redirect to login
-                    window.location.href = 'login.html';
+                    } else {
+                        alert('Failed to load application data. Please start a new application.');
+                        window.location.href = 'loan-application.html';
+                    }
+                } finally {
+                    hideLoading();
                 }
-            });
+            } else {
+                // User is not signed in, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
 
-            // Handle processing speed selection
-            const speedOptions = document.querySelectorAll('.speed-option');
-            speedOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove active class from all options
-                    speedOptions.forEach(opt => {
-                        opt.classList.remove('active');
-                    });
-                    
-                    // Add active class to selected option
-                    this.classList.add('active');
-                    
-                    // Store selection in session storage
-                    const selectedSpeed = this.dataset.speed;
-                    const selectedFee = this.dataset.fee;
-                    
-                    let appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
-                    appData.processingSpeed = selectedSpeed;
-                    appData.processingFee = selectedFee;
-                    sessionStorage.setItem('loanApplication', JSON.stringify(appData));
-                });
-            });
-
-            // Modal controls
-            const paymentModal = document.getElementById('paymentModal');
-            const closeModal = document.getElementById('closeModal');
-            const processingFeeAmount = document.getElementById('processingFeeAmount');
-            const paymentSpinner = document.getElementById('paymentSpinner');
-            const paymentStatus = document.getElementById('paymentStatus');
-
-            closeModal.addEventListener('click', function() {
-                paymentModal.style.display = 'none';
-            });
-
-            // Button event listeners
-            document.getElementById('backBtn').addEventListener('click', function() {
-                window.location.href = 'loan-application-2.html';
-            });
-            
-            document.getElementById('submitBtn').addEventListener('click', async function() {
-                const user = auth.currentUser;
-                if (!user) {
-                    alert('Please sign in to submit your application');
-                    return;
-                }
-
-                // Get selected processing option
-                const selectedOption = document.querySelector('.speed-option.active');
-                if (!selectedOption) {
-                    alert('Please select a processing speed option');
-                    return;
-                }
-
-                const processingFee = parseFloat(selectedOption.dataset.fee);
-                processingFeeAmount.textContent = formatCurrency(processingFee);
-
-                // Show payment modal
-                paymentModal.style.display = 'flex';
-                paymentStatus.textContent = '';
-                paymentSpinner.style.display = 'none';
-
+        // Handle processing speed selection
+        const speedOptions = document.querySelectorAll('.speed-option');
+        speedOptions.forEach(option => {
+            option.addEventListener('click', async function() {
+                speedOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update session storage immediately
+                let appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
+                appData.processingSpeed = this.dataset.speed;
+                appData.processingFee = this.dataset.fee;
+                sessionStorage.setItem('loanApplication', JSON.stringify(appData));
+                
+                // Update Firestore in background
                 try {
-                    // Initialize Paystack payment
-                    initializePaystackPayment(user.email, processingFee, async (error, response) => {
-                        if (error) {
-                            paymentStatus.textContent = error;
-                            paymentStatus.style.color = 'var(--danger)';
-                            return;
-                        }
-
-                        // Payment successful
-                        paymentSpinner.style.display = 'block';
-                        paymentStatus.textContent = 'Payment successful! Submitting your application...';
-                        paymentStatus.style.color = 'var(--success)';
-
-                        try {
-                            // Submit application with payment reference
-                            await submitApplication(user, response.reference);
-                        } catch (submitError) {
-                            paymentSpinner.style.display = 'none';
-                            paymentStatus.textContent = 'Application submission failed. Please contact support.';
-                            paymentStatus.style.color = 'var(--danger)';
-                            console.error('Submission error:', submitError);
-                        }
-                    });
-                } catch (paymentError) {
-                    paymentStatus.textContent = 'Error initializing payment. Please try again.';
-                    paymentStatus.style.color = 'var(--danger)';
-                    console.error('Payment error:', paymentError);
-                }
-            });
-
-            // Close modal when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target === paymentModal) {
-                    paymentModal.style.display = 'none';
+                    const user = auth.currentUser;
+                    if (user) {
+                        await savePendingApplication(user, appData);
+                    }
+                } catch (error) {
+                    console.error('Background update failed:', error);
                 }
             });
         });
-    </script>
+
+        // Modal controls
+        const paymentModal = document.getElementById('paymentModal');
+        const closeModal = document.getElementById('closeModal');
+        const processingFeeAmount = document.getElementById('processingFeeAmount');
+        const paymentSpinner = document.getElementById('paymentSpinner');
+        const paymentStatus = document.getElementById('paymentStatus');
+
+        closeModal.addEventListener('click', function() {
+            paymentModal.style.display = 'none';
+        });
+
+        // Button event listeners
+        document.getElementById('backBtn').addEventListener('click', function() {
+            window.location.href = 'loan-application-2.html';
+        });
+        
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please sign in to submit your application');
+                return;
+            }
+
+            const selectedOption = document.querySelector('.speed-option.active');
+            if (!selectedOption) {
+                alert('Please select a processing speed option');
+                return;
+            }
+
+            const processingFee = parseFloat(selectedOption.dataset.fee);
+            processingFeeAmount.textContent = formatCurrency(processingFee);
+
+            // Show payment modal
+            paymentModal.style.display = 'flex';
+            paymentStatus.textContent = '';
+            paymentSpinner.style.display = 'none';
+
+            try {
+                // Ensure we have the latest data in Firestore
+                const appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
+                const docId = await savePendingApplication(user, appData);
+                
+                // Initialize Paystack payment
+                initializePaystackPayment(user.email, processingFee, async (error, response) => {
+                    if (error) {
+                        paymentStatus.textContent = error;
+                        paymentStatus.style.color = 'var(--danger)';
+                        return;
+                    }
+
+                    paymentSpinner.style.display = 'block';
+                    paymentStatus.textContent = 'Processing payment...';
+                    paymentStatus.style.color = 'var(--primary-blue)';
+
+                    try {
+                        await updateApplicationStatus(docId, response.reference);
+                        paymentStatus.textContent = 'Payment successful! Redirecting...';
+                        setTimeout(() => {
+                            window.location.href = 'review.html';
+                        }, 1500);
+                    } catch (submitError) {
+                        paymentSpinner.style.display = 'none';
+                        paymentStatus.textContent = 'Application update failed. Please contact support.';
+                        paymentStatus.style.color = 'var(--danger)';
+                        console.error('Submission error:', submitError);
+                    }
+                });
+            } catch (paymentError) {
+                paymentStatus.textContent = 'Error initializing payment. Please try again.';
+                paymentStatus.style.color = 'var(--danger)';
+                console.error('Payment error:', paymentError);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === paymentModal) {
+                paymentModal.style.display = 'none';
+            }
+        });
+    });
+</script>
 </body>
 </html>

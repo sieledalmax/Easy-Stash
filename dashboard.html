@@ -30,7 +30,7 @@
             background-color: var(--dark-bg);
             color: var(--text-light);
             line-height: 1.6;
-            padding-bottom: 80px; /* Space for bottom nav */
+            padding-bottom: 80px;
         }
 
         .container {
@@ -190,6 +190,8 @@
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
+            position: relative;
+            padding-bottom: 40px;
         }
 
         .loan-header {
@@ -402,6 +404,35 @@
             transition: width 0.1s linear;
             border-radius: 3px;
         }
+
+        /* Loan Card Extras */
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
+        
+        .complete-application-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .pending-disbursement {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            color: var(--warning);
+            font-size: 12px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -460,25 +491,10 @@
                 <h2>Active Loans</h2>
                 <a href="#">See All</a>
             </div>
-            <div class="loan-card">
-                <div class="loan-header">
-                    <div class="loan-title">Personal Loan #PL-2023-0456</div>
-                    <div class="loan-amount">$12,500</div>
+            <div id="activeLoansContainer">
+                <div class="loan-card empty-state">
+                    <p>You have no active loans</p>
                 </div>
-                <div class="loan-details">
-                    Next payment: <strong>May 15, 2023</strong> • $245.78
-                </div>
-                <span class="loan-status status-active">Active</span>
-            </div>
-            <div class="loan-card">
-                <div class="loan-header">
-                    <div class="loan-title">Home Improvement #HI-2023-0789</div>
-                    <div class="loan-amount">$8,250</div>
-                </div>
-                <div class="loan-details">
-                    Next payment: <strong>May 20, 2023</strong> • $189.50
-                </div>
-                <span class="loan-status status-active">Active</span>
             </div>
         </div>
 
@@ -488,15 +504,10 @@
                 <h2>Pending Applications</h2>
                 <a href="#">See All</a>
             </div>
-            <div class="loan-card">
-                <div class="loan-header">
-                    <div class="loan-title">Auto Loan #AL-2023-0123</div>
-                    <div class="loan-amount">$15,000</div>
+            <div id="pendingLoansContainer">
+                <div class="loan-card empty-state">
+                    <p>You have no pending applications</p>
                 </div>
-                <div class="loan-details">
-                    Applied: <strong>April 28, 2023</strong> • Under review
-                </div>
-                <span class="loan-status status-pending">Processing</span>
             </div>
         </div>
 
@@ -506,15 +517,8 @@
                 <h2>Past Loans</h2>
                 <a href="#">See All</a>
             </div>
-            <div class="loan-card">
-                <div class="loan-header">
-                    <div class="loan-title">Debt Consolidation #DC-2022-0897</div>
-                    <div class="loan-amount">$10,000</div>
-                </div>
-                <div class="loan-details">
-                    Paid off: <strong>January 10, 2023</strong>
-                </div>
-                <span class="loan-status status-completed">Closed</span>
+            <div class="loan-card empty-state">
+                <p>You have no past loans</p>
             </div>
         </div>
     </div>
@@ -584,181 +588,447 @@
     
     <script>
         // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
-            authDomain: "easy-stash.firebaseapp.com",
-            projectId: "easy-stash",
-            storageBucket: "easy-stash.firebasestorage.app",
-            messagingSenderId: "12483019",
-            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
-            measurementId: "G-FPK26FLF7V"
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+    authDomain: "easy-stash.firebaseapp.com",
+    projectId: "easy-stash",
+    storageBucket: "easy-stash.appspot.com", // Fixed storage bucket URL
+    messagingSenderId: "12483019",
+    appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+    measurementId: "G-FPK26FLF7V"
+};
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-        // DOM Elements
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const userAvatar = document.getElementById('userAvatar');
-        const toast = document.getElementById('toast');
-        const makePaymentBtn = document.getElementById('makePaymentBtn');
-        const notificationsBtn = document.getElementById('notificationsBtn');
-        const paymentModal = document.getElementById('paymentModal');
-        const notificationsModal = document.getElementById('notificationsModal');
-        const paymentProgress = document.getElementById('paymentProgress');
-        const paymentMessage = document.getElementById('paymentMessage');
-        const paymentOkBtn = document.getElementById('paymentOkBtn');
-        const notificationsOkBtn = document.getElementById('notificationsOkBtn');
+// DOM Elements
+const welcomeMessage = document.getElementById('welcomeMessage');
+const userAvatar = document.getElementById('userAvatar');
+const toast = document.getElementById('toast');
+const makePaymentBtn = document.getElementById('makePaymentBtn');
+const notificationsBtn = document.getElementById('notificationsBtn');
+const paymentModal = document.getElementById('paymentModal');
+const notificationsModal = document.getElementById('notificationsModal');
+const paymentProgress = document.getElementById('paymentProgress');
+const paymentMessage = document.getElementById('paymentMessage');
+const paymentOkBtn = document.getElementById('paymentOkBtn');
+const notificationsOkBtn = document.getElementById('notificationsOkBtn');
+const activeLoansContainer = document.getElementById('activeLoansContainer');
+const pendingLoansContainer = document.getElementById('pendingLoansContainer');
 
-        // Show toast notification
-        function showToast(message, type = 'success', duration = 3000) {
-            toast.textContent = message;
-            toast.className = `toast ${type}`;
-            toast.classList.add('show');
+// Show toast notification
+function showToast(message, type = 'success', duration = 3000) {
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, duration);
+}
+
+// Show modal
+function showModal(modal) {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Hide modal
+function hideModal(modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+// Get user initials from name
+function getInitials(name) {
+    if (!name) return 'US';
+    
+    const names = name.split(' ');
+    let initials = names[0].substring(0, 1).toUpperCase();
+    
+    if (names.length > 1) {
+        initials += names[names.length - 1].substring(0, 1).toUpperCase();
+    }
+    
+    return initials;
+}
+
+// Get first name only
+function getFirstName(fullName) {
+    if (!fullName) return 'User';
+    return fullName.split(' ')[0];
+}
+
+// Format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(amount);
+}
+
+// Redirect to login if not authenticated
+function checkAuthState(user) {
+    if (!user) {
+        showToast("Please login to continue", "error");
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
+        return false;
+    }
+    return true;
+}
+
+// Fetch user data from Firestore
+async function fetchUserData(userId) {
+    try {
+        console.log("Fetching user data for:", userId);
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            console.log("User data found:", userData);
             
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, duration);
-        }
-
-        // Show modal
-        function showModal(modal) {
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Hide modal
-        function hideModal(modal) {
-            modal.classList.remove('show');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Get user initials from name
-        function getInitials(name) {
-            if (!name) return 'US';
-            
-            const names = name.split(' ');
-            let initials = names[0].substring(0, 1).toUpperCase();
-            
-            if (names.length > 1) {
-                initials += names[names.length - 1].substring(0, 1).toUpperCase();
+            // Update welcome message with first name only
+            if (userData.name) {
+                const firstName = getFirstName(userData.name);
+                welcomeMessage.textContent = `Welcome back, ${firstName}!`;
             }
             
-            return initials;
-        }
-
-        // Get first name only
-        function getFirstName(fullName) {
-            if (!fullName) return 'User';
-            return fullName.split(' ')[0];
-        }
-
-        // Redirect to login if not authenticated
-        function checkAuthState(user) {
-            if (!user) {
-                showToast("Please login to continue", "error");
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 1500);
-                return false;
+            // Update avatar with initials
+            if (userData.name) {
+                userAvatar.textContent = getInitials(userData.name);
             }
-            return true;
+        } else {
+            console.log("No user document found");
+        }
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+        showToast("Error loading user profile", "error");
+    }
+}
+
+// Enhanced loan data fetcher - FIXED VERSION
+async function fetchAndDisplayLoans() {
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            console.log("User not authenticated");
+            return;
         }
 
-        // Fetch user data from Firestore
-        async function fetchUserData(userId) {
+        console.log("Fetching loans for user:", user.uid);
+
+        // Fetch loans without orderBy to avoid composite index requirement
+        const activeLoansQuery = db.collection('loanApplications')
+            .where('userId', '==', user.uid)
+            .where('status', '==', 'active');
+            
+        const pendingLoansQuery = db.collection('loanApplications')
+            .where('userId', '==', user.uid)
+            .where('status', '==', 'pending');
+
+        // Execute queries in parallel
+        const [activeSnapshot, pendingSnapshot] = await Promise.all([
+            activeLoansQuery.get(),
+            pendingLoansQuery.get()
+        ]);
+
+        console.log("Active loans found:", activeSnapshot.size);
+        console.log("Pending loans found:", pendingSnapshot.size);
+
+        // Log all found documents for debugging
+        activeSnapshot.forEach(doc => {
+            console.log("Active loan:", doc.id, doc.data());
+        });
+        pendingSnapshot.forEach(doc => {
+            console.log("Pending loan:", doc.id, doc.data());
+        });
+
+        // Display active loans
+        displayLoans(activeSnapshot, 'activeLoansContainer', 'active');
+        
+        // Display pending loans
+        displayLoans(pendingSnapshot, 'pendingLoansContainer', 'pending');
+
+    } catch (error) {
+        console.error("Loan data error:", error);
+        console.error("Error details:", error.message);
+        
+        showToast("Error loading loan data. Please refresh.", "error");
+        
+        // Show error states
+        document.getElementById('activeLoansContainer').innerHTML = `
+            <div class="loan-card empty-state">
+                <p>Error loading active loans</p>
+                <small style="color: #ed5565;">Check console for details</small>
+            </div>
+        `;
+        document.getElementById('pendingLoansContainer').innerHTML = `
+            <div class="loan-card empty-state">
+                <p>Error loading pending applications</p>
+                <small style="color: #ed5565;">Check console for details</small>
+            </div>
+        `;
+    }
+}
+
+// Helper function to display loans - IMPROVED VERSION
+function displayLoans(querySnapshot, containerId, loanType) {
+    const container = document.getElementById(containerId);
+    
+    if (querySnapshot.empty) {
+        container.innerHTML = `
+            <div class="loan-card empty-state">
+                <p>You have no ${loanType === 'active' ? 'active loans' : 'pending applications'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Convert to array and sort manually (since we removed orderBy)
+    const loans = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        data: doc.data()
+    })).sort((a, b) => {
+        // Sort by createdAt descending
+        const dateA = new Date(a.data.createdAt || 0);
+        const dateB = new Date(b.data.createdAt || 0);
+        return dateB - dateA;
+    });
+
+    container.innerHTML = loans.map(loan => {
+        const data = loan.data;
+        
+        // Handle different data types for loanAmount
+        let loanAmount = 0;
+        if (typeof data.loanAmount === 'string') {
+            loanAmount = parseFloat(data.loanAmount) || 0;
+        } else if (typeof data.loanAmount === 'number') {
+            loanAmount = data.loanAmount;
+        }
+        
+        // Handle date formatting
+        let appliedDate = 'N/A';
+        if (data.createdAt) {
             try {
-                const userDoc = await db.collection('users').doc(userId).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    
-                    // Update welcome message with first name only
-                    if (userData.name) {
-                        const firstName = getFirstName(userData.name);
-                        welcomeMessage.textContent = `Welcome back, ${firstName}!`;
-                    }
-                    
-                    // Update avatar with initials
-                    if (userData.name) {
-                        userAvatar.textContent = getInitials(userData.name);
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
+                appliedDate = new Date(data.createdAt).toLocaleDateString();
+            } catch (e) {
+                console.warn("Date parsing error:", e);
+                appliedDate = 'Recent';
             }
         }
+        
+        return `
+            <div class="loan-card">
+                <div class="loan-header">
+                    <div class="loan-title">${data.loanPurpose || 'Personal Loan'} #${loan.id.slice(-4)}</div>
+                    <div class="loan-amount">${formatCurrency(loanAmount)}</div>
+                </div>
+                <div class="loan-details">
+                    Applied: <strong>${appliedDate}</strong>
+                    ${loanType === 'pending' ? ' • Application not complete' : ''}
+                    ${data.loanTerm ? ` • ${data.loanTerm}` : ''}
+                </div>
+                <span class="loan-status ${loanType === 'active' ? 'status-active' : 'status-pending'}">
+                    ${loanType === 'active' ? 'Active' : 'Processing'}
+                </span>
+                ${loanType === 'pending' 
+                    ? '<button class="complete-application-btn" onclick="completePendingApplication(\'' + loan.id + '\')">Complete Application</button>'
+                    : '<span class="pending-disbursement">Pending disbursement</span>'}
+            </div>
+        `;
+    }).join('');
+}
 
-        // Handle payment button click
-        makePaymentBtn.addEventListener('click', () => {
-            showModal(paymentModal);
+/// Function to handle completing pending applications
+async function completePendingApplication(applicationId) {
+    try {
+        // Store ONLY the loan ID in session storage
+        sessionStorage.setItem('currentLoanApplicationId', applicationId);
+        
+        // Redirect to the application page
+        window.location.href = 'loan-application-3.html';
+    } catch (error) {
+        console.error("Error completing application:", error);
+        showToast("Error opening application", "error");
+    }
+}
+
+// Alternative query method with better error handling
+async function fetchLoansWithRetry() {
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+        try {
+            await fetchAndDisplayLoans();
+            return; // Success, exit retry loop
+        } catch (error) {
+            retryCount++;
+            console.log(`Retry ${retryCount}/${maxRetries} failed:`, error);
             
-            // Reset progress bar
-            paymentProgress.style.width = '0%';
-            paymentMessage.textContent = 'Processing your payment request...';
-            paymentOkBtn.style.display = 'none';
+            if (retryCount >= maxRetries) {
+                console.error("All retries failed, showing fallback UI");
+                showFallbackUI();
+            } else {
+                // Wait before retrying (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            }
+        }
+    }
+}
+
+function showFallbackUI() {
+    document.getElementById('activeLoansContainer').innerHTML = `
+        <div class="loan-card empty-state">
+            <p>Unable to load loan data</p>
+            <button class="btn btn-primary" onclick="fetchAndDisplayLoans()" style="margin-top: 10px;">
+                Try Again
+            </button>
+        </div>
+    `;
+    document.getElementById('pendingLoansContainer').innerHTML = `
+        <div class="loan-card empty-state">
+            <p>Unable to load pending applications</p>
+            <button class="btn btn-primary" onclick="fetchAndDisplayLoans()" style="margin-top: 10px;">
+                Try Again
+            </button>
+        </div>
+    `;
+}
+
+// Temporary debugging function - remove in production
+async function debugFirestore() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.log("No user authenticated for debugging");
+        return;
+    }
+    
+    console.log("=== DEBUG: Checking all loan applications ===");
+    try {
+        const allDocs = await db.collection('loanApplications').get();
+        console.log(`Total documents in collection: ${allDocs.size}`);
+        
+        allDocs.forEach(doc => {
+            const data = doc.data();
+            console.log(`Doc ID: ${doc.id}`);
+            console.log(`User ID: ${data.userId}`);
+            console.log(`Current User ID: ${user.uid}`);
+            console.log(`Status: ${data.status}`);
+            console.log(`Created: ${data.createdAt}`);
+            console.log(`Loan Amount: ${data.loanAmount}`);
+            console.log("---");
+        });
+        
+        // Check specifically for current user's documents
+        const userDocs = await db.collection('loanApplications')
+            .where('userId', '==', user.uid)
+            .get();
+        console.log(`Documents for current user: ${userDocs.size}`);
+    } catch (error) {
+        console.error("Debug error:", error);
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle payment button click
+    makePaymentBtn.addEventListener('click', () => {
+        showModal(paymentModal);
+        
+        // Reset progress bar
+        paymentProgress.style.width = '0%';
+        paymentMessage.textContent = 'Processing your payment request...';
+        paymentOkBtn.style.display = 'none';
+        
+        // Simulate payment processing
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 1;
+            paymentProgress.style.width = `${progress}%`;
             
-            // Simulate payment processing
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 1;
-                paymentProgress.style.width = `${progress}%`;
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    paymentMessage.textContent = 'You have no loans to repay at this time.';
-                    paymentOkBtn.style.display = 'block';
-                }
-            }, 20); // 2 seconds total (100 steps * 20ms)
-        });
+            if (progress >= 100) {
+                clearInterval(interval);
+                paymentMessage.textContent = 'You have no loans to repay at this time.';
+                paymentOkBtn.style.display = 'block';
+            }
+        }, 20);
+    });
 
-        // Handle notifications button click
-        notificationsBtn.addEventListener('click', () => {
-            showModal(notificationsModal);
-        });
+    // Handle notifications button click
+    notificationsBtn.addEventListener('click', () => {
+        showModal(notificationsModal);
+    });
 
-        // Handle modal close buttons
-        paymentOkBtn.addEventListener('click', () => {
-            hideModal(paymentModal);
-        });
+    // Handle modal close buttons
+    paymentOkBtn.addEventListener('click', () => {
+        hideModal(paymentModal);
+    });
 
-        notificationsOkBtn.addEventListener('click', () => {
-            hideModal(notificationsModal);
-        });
+    notificationsOkBtn.addEventListener('click', () => {
+        hideModal(notificationsModal);
+    });
 
-        // Close modals when clicking outside
-        [paymentModal, notificationsModal].forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    hideModal(modal);
-                }
-            });
-        });
-
-        // Handle avatar click
-        userAvatar.addEventListener('click', () => {
-            window.location.href = 'profile.html';
-        });
-
-        // Auth state listener
-        auth.onAuthStateChanged((user) => {
-            if (checkAuthState(user)) {
-                // User is signed in, fetch their data
-                fetchUserData(user.uid);
+    // Close modals when clicking outside
+    [paymentModal, notificationsModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal(modal);
             }
         });
+    });
 
-        // Check if there's a redirect message in session storage
-        document.addEventListener('DOMContentLoaded', () => {
-            const redirectMessage = sessionStorage.getItem('redirectMessage');
-            if (redirectMessage) {
-                const messageType = sessionStorage.getItem('redirectMessageType') || 'success';
-                showToast(redirectMessage, messageType, 5000);
-                sessionStorage.removeItem('redirectMessage');
-                sessionStorage.removeItem('redirectMessageType');
-            }
-        });
+    // Handle avatar click
+    userAvatar.addEventListener('click', () => {
+        window.location.href = 'profile.html';
+    });
+
+    // Check if there's a redirect message in session storage
+    const redirectMessage = sessionStorage.getItem('redirectMessage');
+    if (redirectMessage) {
+        const messageType = sessionStorage.getItem('redirectMessageType') || 'success';
+        showToast(redirectMessage, messageType, 5000);
+        sessionStorage.removeItem('redirectMessage');
+        sessionStorage.removeItem('redirectMessageType');
+    }
+});
+
+// Auth state listener - UPDATED
+auth.onAuthStateChanged(async (user) => {
+    if (checkAuthState(user)) {
+        console.log("User authenticated:", user.uid);
+        
+        // User is signed in, fetch their data
+        try {
+            await fetchUserData(user.uid);
+            
+            // Use retry method for better reliability
+            await fetchLoansWithRetry();
+            
+            // Uncomment this line temporarily for debugging
+            // await debugFirestore();
+            
+        } catch (error) {
+            console.error("Error in auth state change:", error);
+            showToast("Error loading dashboard data", "error");
+        }
+    }
+});
+
+// Global error handler
+window.addEventListener('error', function(e) {
+    console.error('Global error caught:', e.error);
+    showToast("An unexpected error occurred", "error");
+});
+
+// Global promise rejection handler
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('Unhandled promise rejection:', e.reason);
+    showToast("Connection error. Please check your network.", "error");
+});
     </script>
 </body>
 </html>
