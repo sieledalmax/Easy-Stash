@@ -512,7 +512,7 @@
                     await db.collection('users').doc(user.uid).update({
                         lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'finish.html';
                 }
             } catch (error) {
                 console.error("Google signup error: ", error);

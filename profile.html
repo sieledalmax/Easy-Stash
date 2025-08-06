@@ -163,6 +163,8 @@
         .info-value {
             font-size: 14px;
             font-weight: 500;
+            text-align: right;
+            max-width: 60%;
         }
 
         /* Verification Status */
@@ -256,6 +258,63 @@
             color: var(--primary-blue);
         }
 
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-left: 10px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-blue);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Bank Account Number */
+        .account-number {
+            display: flex;
+            align-items: center;
+        }
+
+        .hidden-number {
+            letter-spacing: 2px;
+        }
+
         /* Responsive Tweaks */
         @media (min-width: 768px) {
             .container {
@@ -263,6 +322,21 @@
                 margin: 0 auto;
             }
         }
+
+        .ssn-value {
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.account-number {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 60%;
+}
     </style>
 </head>
 <body>
@@ -287,11 +361,11 @@
         <!-- Profile Header -->
         <div class="profile-header">
             <div class="profile-avatar" id="profileAvatar">JD</div>
-            <h2 class="profile-name" id="profileName">John Doe</h2>
-            <div class="profile-email" id="profileEmail">john.doe@example.com</div>
+            <h2 class="profile-name" id="profileName">Loading...</h2>
+            <div class="profile-email" id="profileEmail">user@example.com</div>
             <div class="member-since">
                 <i class="fas fa-calendar-alt"></i>
-                <span id="memberSince">Member since January 2023</span>
+                <span id="memberSince">Member since</span>
             </div>
         </div>
 
@@ -305,25 +379,31 @@
             <div class="profile-card">
                 <div class="info-row">
                     <span class="info-label">Full Name</span>
-                    <span class="info-value" id="fullName">John Doe</span>
+                    <span class="info-value" id="fullName">Loading...</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Phone Number</span>
-                    <span class="info-value" id="phoneNumber">+1 (555) 123-4567</span>
+                    <span class="info-value" id="phoneNumber">Loading...</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Date of Birth</span>
-                    <span class="info-value" id="dob">January 15, 1985</span>
+                    <span class="info-value" id="dob">Loading...</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Address</span>
-                    <span class="info-value" id="address">123 Main St, Apt 4B<br>New York, NY 10001</span>
+                    <span class="info-value" id="address">Loading...</span>
                 </div>
+                <div class="info-row">
+    <span class="info-label">SSN</span>
+    <div class="account-number">
+        <span class="info-value ssn-value" id="ssnDisplay">••• •• ••••</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="toggleSSN">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+</div>
             </div>
-            
-            <button class="action-button btn-edit">
-                <i class="fas fa-pencil-alt"></i> Edit Personal Info
-            </button>
         </div>
 
         <!-- Account Security Section -->
@@ -337,7 +417,7 @@
                 <div class="info-row">
                     <span class="info-label">Email Address</span>
                     <div>
-                        <span class="info-value" id="securityEmail">john.doe@example.com</span>
+                        <span class="info-value" id="securityEmail">Loading...</span>
                         <span class="verification-status">
                             <span class="status-badge verified">Verified</span>
                         </span>
@@ -352,61 +432,45 @@
                         </span>
                     </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Two-Factor Auth</span>
-                    <div>
-                        <span class="info-value">Not Enabled</span>
-                        <span class="verification-status">
-                            <span class="status-badge unverified">Enable</span>
-                        </span>
-                    </div>
-                </div>
             </div>
-            
-            <button class="action-button btn-edit">
-                <i class="fas fa-lock"></i> Update Security Settings
-            </button>
         </div>
 
-        <!-- Documents Section -->
+        <!-- Bank Account Section -->
         <div class="profile-section">
             <h3 class="section-title">
-                <i class="fas fa-file-alt"></i>
-                My Documents
+                <i class="fas fa-university"></i>
+                Bank Account
             </h3>
             
             <div class="profile-card">
                 <div class="info-row">
-                    <span class="info-label">ID Verification</span>
-                    <div>
-                        <span class="info-value">Driver's License</span>
-                        <span class="verification-status">
-                            <span class="status-badge verified">Approved</span>
-                        </span>
-                    </div>
+                    <span class="info-label">Bank Name</span>
+                    <span class="info-value" id="bankName">Loading...</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Proof of Income</span>
-                    <div>
-                        <span class="info-value">Last 3 Pay Stubs</span>
-                        <span class="verification-status">
-                            <span class="status-badge verified">Approved</span>
-                        </span>
-                    </div>
+                    <span class="info-label">Account Type</span>
+                    <span class="info-value" id="accountType">Loading...</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Bank Statements</span>
-                    <div>
-                        <span class="info-value">Not Uploaded</span>
-                        <span class="verification-status">
-                            <span class="status-badge unverified">Required</span>
-                        </span>
-                    </div>
+                    <span class="info-label">Routing Number</span>
+                    <span class="info-value" id="routingNumber">Loading...</span>
                 </div>
+                <div class="info-row">
+    <span class="info-label">Account Number</span>
+    <div class="account-number">
+        <span class="info-value">
+            <span id="accountNumberDisplay">••••••••</span>
+        </span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="toggleAccountNumber">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+</div>
             </div>
             
-            <button class="action-button btn-edit">
-                <i class="fas fa-upload"></i> Upload Documents
+            <button id="editBankButton" class="action-button btn-edit">
+                <i class="fas fa-edit"></i> Edit Bank Account
             </button>
         </div>
 
@@ -422,7 +486,7 @@
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-       <a href="loan-application-1.html" class="nav-item">
+        <a href="loan-application-1.html" class="nav-item">
             <i class="fas fa-hand-holding-usd"></i>
             <span>Loans</span>
         </a>
@@ -436,131 +500,212 @@
         </a>
     </nav>
 
-    <!-- Add Firebase SDKs -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
-            authDomain: "easy-stash.firebaseapp.com",
-            projectId: "easy-stash",
-            storageBucket: "easy-stash.firebasestorage.app",
-            messagingSenderId: "12483019",
-            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
-            measurementId: "G-FPK26FLF7V"
-        };
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+        authDomain: "easy-stash.firebaseapp.com",
+        projectId: "easy-stash",
+        storageBucket: "easy-stash.firebasestorage.app",
+        messagingSenderId: "12483019",
+        appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+        measurementId: "G-FPK26FLF7V"
+    };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        // DOM Elements
-        const profileAvatar = document.getElementById('profileAvatar');
-        const profileName = document.getElementById('profileName');
-        const profileEmail = document.getElementById('profileEmail');
-        const fullName = document.getElementById('fullName');
-        const phoneNumber = document.getElementById('phoneNumber');
-        const dob = document.getElementById('dob');
-        const address = document.getElementById('address');
-        const securityEmail = document.getElementById('securityEmail');
-        const memberSince = document.getElementById('memberSince');
-        const logoutButton = document.getElementById('logoutButton');
+    // DOM Elements
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const fullName = document.getElementById('fullName');
+    const phoneNumber = document.getElementById('phoneNumber');
+    const dob = document.getElementById('dob');
+    const address = document.getElementById('address');
+    const securityEmail = document.getElementById('securityEmail');
+    const memberSince = document.getElementById('memberSince');
+    const logoutButton = document.getElementById('logoutButton');
+    const editBankButton = document.getElementById('editBankButton');
+    const toggleAccountNumber = document.getElementById('toggleAccountNumber');
+    const accountNumberDisplay = document.getElementById('accountNumberDisplay');
+    const toggleSSN = document.getElementById('toggleSSN');
+    const ssnDisplay = document.getElementById('ssnDisplay');
+    const bankName = document.getElementById('bankName');
+    const accountType = document.getElementById('accountType');
+    const routingNumber = document.getElementById('routingNumber');
 
-        // Get user initials from name
-        function getInitials(name) {
-            if (!name) return 'US';
-            
-            const names = name.split(' ');
-            let initials = names[0].substring(0, 1).toUpperCase();
-            
-            if (names.length > 1) {
-                initials += names[names.length - 1].substring(0, 1).toUpperCase();
-            }
-            
-            return initials;
+    // Get user initials from name
+    function getInitials(name) {
+        if (!name) return 'US';
+        
+        const names = name.split(' ');
+        let initials = names[0].substring(0, 1).toUpperCase();
+        
+        if (names.length > 1) {
+            initials += names[names.length - 1].substring(0, 1).toUpperCase();
         }
+        
+        return initials;
+    }
 
-        // Format date to "Month YYYY"
-        function formatMemberSince(date) {
-            if (!date) return '';
-            
-            const options = { year: 'numeric', month: 'long' };
-            return date.toLocaleDateString('en-US', options);
+    // Format phone number
+    function formatPhoneNumber(phone) {
+        if (!phone) return '';
+        const cleaned = ('' + phone).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return '(' + match[1] + ') ' + match[2] + '-' + match[3];
         }
+        return phone;
+    }
 
-        // Format date to "Month DD, YYYY"
-        function formatDOB(date) {
-            if (!date) return '';
-            
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('en-US', options);
-        }
+    // Format date to "Month YYYY"
+    function formatMemberSince(date) {
+        if (!date) return '';
+        const options = { year: 'numeric', month: 'long' };
+        return date.toLocaleDateString('en-US', options);
+    }
 
-        // Fetch user data from Firestore
-        async function fetchUserData(userId) {
-            try {
-                const userDoc = await db.collection('users').doc(userId).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
+    // Format date to "Month DD, YYYY"
+    function formatDOB(date) {
+        if (!date) return '';
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    // Format SSN
+    function formatSSN(ssn, showFull = false) {
+        if (!ssn) return '••• •• ••••';
+        if (ssn.length !== 9) return '••• •• ••••';
+        return showFull ? 
+            `${ssn.substring(0, 3)} ${ssn.substring(3, 5)} ${ssn.substring(5)}` : 
+            `••• •• ${ssn.substring(5)}`;
+    }
+
+    // Format address from components
+    function formatAddress(addressData) {
+        if (!addressData) return '';
+        const { street, city, state, zip } = addressData;
+        return `${street}<br>${city}, ${state} ${zip}`;
+    }
+
+    // Setup toggle for sensitive information
+    function setupToggle(toggleElement, displayElement, value, formatter) {
+        displayElement.textContent = formatter(value, false);
+        
+        toggleElement.addEventListener('change', function() {
+            displayElement.textContent = formatter(value, this.checked);
+        });
+    }
+
+    // Fetch user data from Firestore
+    async function fetchUserData(userId) {
+        try {
+            const userDoc = await db.collection('users').doc(userId).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                
+                // Update profile information
+                if (userData.name) {
+                    profileName.textContent = userData.name;
+                    fullName.textContent = userData.name;
+                    profileAvatar.textContent = getInitials(userData.name);
+                }
+                
+                const authUser = auth.currentUser;
+                if (authUser?.email) {
+                    profileEmail.textContent = authUser.email;
+                    securityEmail.textContent = authUser.email;
+                } else if (userData.email) {
+                    profileEmail.textContent = userData.email;
+                    securityEmail.textContent = userData.email;
+                }
+                
+                if (userData.phone) {
+                    phoneNumber.textContent = formatPhoneNumber(userData.phone);
+                }
+                
+                if (userData.dob) {
+                    const dobDate = userData.dob.toDate();
+                    dob.textContent = formatDOB(dobDate);
+                }
+                
+                if (userData.address) {
+                    address.innerHTML = formatAddress(userData.address);
+                }
+                
+                if (userData.ssn) {
+                    setupToggle(toggleSSN, ssnDisplay, userData.ssn, formatSSN);
+                }
+
+                // Set member since date
+                if (userData.createdAt) {
+                    const joinDate = userData.createdAt.toDate();
+                    memberSince.textContent = `Member since ${formatMemberSince(joinDate)}`;
+                } else if (authUser?.metadata?.creationTime) {
+                    const joinDate = new Date(authUser.metadata.creationTime);
+                    memberSince.textContent = `Member since ${formatMemberSince(joinDate)}`;
+                }
+
+                // Update bank information
+                if (userData.bankAccount) {
+                    const bank = userData.bankAccount;
+                    if (bank.bankName) bankName.textContent = bank.bankName;
                     
-                    // Update profile information
-                    if (userData.name) {
-                        profileName.textContent = userData.name;
-                        fullName.textContent = userData.name;
-                        profileAvatar.textContent = getInitials(userData.name);
+                    if (bank.accountType) {
+                        accountType.textContent = bank.accountType === 'checking' ? 'Checking' : 'Savings';
                     }
                     
-                    if (userData.email) {
-                        profileEmail.textContent = userData.email;
-                        securityEmail.textContent = userData.email;
+                    if (bank.routingNumber) {
+                        routingNumber.textContent = bank.routingNumber;
                     }
                     
-                    if (userData.phone) {
-                        phoneNumber.textContent = userData.phone;
-                    }
-                    
-                    if (userData.dob) {
-                        const dobDate = userData.dob.toDate();
-                        dob.textContent = formatDOB(dobDate);
-                    }
-                    
-                    if (userData.address) {
-                        address.textContent = userData.address;
-                    }
-                    
-                    if (userData.createdAt) {
-                        const joinDate = userData.createdAt.toDate();
-                        memberSince.textContent = `Member since ${formatMemberSince(joinDate)}`;
+                    if (bank.accountNumber) {
+                        setupToggle(
+                            toggleAccountNumber, 
+                            accountNumberDisplay, 
+                            bank.accountNumber, 
+                            (num, show) => show ? num : `••••${num.slice(-4)}`
+                        );
                     }
                 }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
             }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
         }
+    }
 
-        // Handle logout
-        logoutButton.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = 'login.html';
-            }).catch((error) => {
-                console.error("Logout error:", error);
-                alert("Failed to log out. Please try again.");
-            });
-        });
+    // Handle bank account edit
+    editBankButton.addEventListener('click', () => {
+        window.location.href = 'bank.html';
+    });
 
-        // Auth state listener
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-            } else {
-                // User is signed in, fetch their data
-                fetchUserData(user.uid);
-            }
+    // Handle logout
+    logoutButton.addEventListener('click', () => {
+        auth.signOut().then(() => {
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error("Logout error:", error);
+            alert("Failed to log out. Please try again.");
         });
-    </script>
+    });
+
+    // Auth state listener
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            fetchUserData(user.uid);
+        }
+    });
+</script>
 </body>
 </html>

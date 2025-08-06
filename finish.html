@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Complete Your Account | Easy Stash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0 30px;
+            position: relative;
+        }
+
+        .progress-steps:before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--card-bg);
+            z-index: 1;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 3px;
+            background-color: var(--primary-blue);
+            z-index: 2;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+            cursor: default;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            border: 2px solid var(--card-bg);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            border-color: var(--success);
+            color: white;
+            font-size: 16px;
+        }
+
+        .step.completed .step-number i {
+            margin: 0;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 80px;
+        }
+
+        .step.active .step-label {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Form Card */
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label,
+        .form-group .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url(
+                "data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23b8c2cc'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"
+            );
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 15px;
+        }
+
+        .dob-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dob-select {
+            flex: 1;
+        }
+
+        /* Validation messages */
+        .validation-message,
+        .error-message {
+            font-size: 13px;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Buttons */
+        .button-group,
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn,
+        .action-button {
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1 1 auto;
+            min-width: 140px;
+        }
+
+        .btn-primary,
+        .action-button.btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .action-button.btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-outline,
+        .action-button.btn-outline,
+        .btn-secondary,
+        .action-button.btn-secondary {
+            background-color: transparent;
+            border: 1.5px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-outline:hover,
+        .action-button.btn-outline:hover,
+        .btn-secondary:hover,
+        .action-button.btn-secondary:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:disabled,
+        .action-button.btn-primary:disabled {
+            background-color: var(--card-bg);
+            cursor: not-allowed;
+            color: var(--text-muted);
+            border-color: var(--card-bg);
+        }
+
+        /* Review Section */
+        #reviewPersonal p,
+        #reviewBank p {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        #reviewPersonal strong,
+        #reviewBank strong {
+            color: var(--primary-blue);
+        }
+
+        /* Footer Text */
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        .footer-text a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing your information...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Easy Stash</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="form-title">Complete Your Account</h1>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-bar" id="progressBar"></div>
+
+            <div class="step active" id="step1Div">
+                <div class="step-number" id="step1Number">1</div>
+                <div class="step-label">Personal Info</div>
+            </div>
+            <div class="step" id="step2Div">
+                <div class="step-number" id="step2Number">2</div>
+                <div class="step-label">Bank Details</div>
+            </div>
+            <div class="step" id="step3Div">
+                <div class="step-number" id="step3Number">3</div>
+                <div class="step-label">Review</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Personal Information -->
+        <form id="personalInfoForm" class="form-card" style="display: block;">
+            <div class="form-group">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="tel" id="phone" class="form-control" placeholder="(123) 456-7890" required />
+                <div class="validation-message" id="phoneValidation">
+                    Please enter a complete 10-digit phone number
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                <div class="dob-container">
+                    <select id="dobMonth" class="form-control select-control dob-select" required>
+                        <option value="" disabled selected>Month</option>
+                        <!-- Months populated by JS -->
+                    </select>
+                    <select id="dobDay" class="form-control select-control dob-select" required>
+                        <option value="" disabled selected>Day</option>
+                        <!-- Days populated by JS -->
+                    </select>
+                    <select id="dobYear" class="form-control select-control dob-select" required>
+                        <option value="" disabled selected>Year</option>
+                        <!-- Years populated by JS -->
+                    </select>
+                </div>
+                <div class="validation-message" id="dobValidation">Please select a valid date</div>
+            </div>
+
+            <div class="form-group">
+                <label for="address" class="form-label">Street Address</label>
+                <input type="text" id="address" class="form-control" placeholder="123 Main St" required />
+            </div>
+
+            <div class="form-group">
+                <label for="city" class="form-label">City</label>
+                <input type="text" id="city" class="form-control" placeholder="New York" required />
+            </div>
+
+            <div class="form-group">
+                <label for="state" class="form-label">State</label>
+                <select id="state" class="form-control select-control" required>
+                    <option value="" disabled selected>Select state</option>
+                    <option value="AL">Alabama</option>
+                    <option value="AK">Alaska</option>
+                    <!-- All states here -->
+                    <option value="WY">Wyoming</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="zip" class="form-label">ZIP Code</label>
+                <input
+                    type="text"
+                    id="zip"
+                    class="form-control"
+                    placeholder="10001"
+                    pattern="\d{5}(-\d{4})?"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="ssn" class="form-label">Social Security Number</label>
+                <input type="text" id="ssn" class="form-control" placeholder="XXX-XX-XXXX" required />
+                <div class="validation-message" id="ssnValidation">Please enter a complete 9-digit SSN</div>
+            </div>
+
+            <div class="button-group" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-primary">Continue to Bank Details</button>
+            </div>
+        </form>
+
+        <!-- Step 2: Bank Information -->
+        <form id="bankInfoForm" class="form-card" style="display: none;">
+            <div class="form-group">
+                <label for="bankName" class="form-label">Bank Name</label>
+                <input
+                    type="text"
+                    id="bankName"
+                    class="form-control"
+                    placeholder="e.g. Chase, Bank of America"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="accountType" class="form-label">Account Type</label>
+                <select id="accountType" class="form-control select-control" required>
+                    <option value="" disabled selected>Select account type</option>
+                    <option value="checking">Checking Account</option>
+                    <option value="savings">Savings Account</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="routingNumber" class="form-label">Routing Number</label>
+                <input
+                    type="text"
+                    id="routingNumber"
+                    class="form-control"
+                    placeholder="9-digit routing number"
+                    pattern="\d{9}"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="accountNumber" class="form-label">Account Number</label>
+                <input type="text" id="accountNumber" class="form-control" placeholder="Your account number" required />
+            </div>
+
+            <div class="form-group">
+                <label for="confirmAccountNumber" class="form-label">Confirm Account Number</label>
+                <input
+                    type="text"
+                    id="confirmAccountNumber"
+                    class="form-control"
+                    placeholder="Re-enter account number"
+                    required
+                />
+                <div class="validation-message" id="accountValidation">Account numbers don't match</div>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-muted);">
+                <i class="fas fa-lock"></i> Your bank details are securely encrypted and stored.
+            </p>
+
+            <div class="button-group" style="margin-top: 10px;">
+                <button type="button" class="btn btn-outline" id="backToPersonal">Back</button>
+                <button type="submit" class="btn btn-primary">Continue to Review</button>
+            </div>
+        </form>
+
+        <!-- Step 3: Review Information -->
+        <div id="reviewInfo" class="form-card" style="display: none;">
+            <h3 style="margin-bottom: 20px; text-align: center;">Review Your Information</h3>
+
+            <div class="form-group">
+                <h4 style="margin-bottom: 15px; color: var(--primary-blue);">Personal Information</h4>
+                <div id="reviewPersonal"></div>
+            </div>
+
+            <div class="form-group">
+                <h4 style="margin-bottom: 15px; color: var(--primary-blue);">Bank Information</h4>
+                <div id="reviewBank"></div>
+            </div>
+
+            <div class="form-group">
+                <p style="font-size: 13px; color: var(--text-muted);">
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    By submitting, you agree to our Terms of Service and Privacy Policy.
+                </p>
+            </div>
+
+            <div class="button-group" style="margin-top: 10px;">
+                <button type="button" class="btn btn-outline" id="backToBank">Back</button>
+                <button type="button" class="btn btn-primary" id="completeSetup">Complete Setup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.firebaseapp.com",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V",
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const progressBar = document.getElementById('progressBar');
+
+        // Step containers and indicators
+        const personalInfoForm = document.getElementById('personalInfoForm');
+        const bankInfoForm = document.getElementById('bankInfoForm');
+        const reviewInfo = document.getElementById('reviewInfo');
+
+        const backToPersonal = document.getElementById('backToPersonal');
+        const backToBank = document.getElementById('backToBank');
+        const completeSetupBtn = document.getElementById('completeSetup');
+
+        const step1Div = document.getElementById('step1Div');
+        const step2Div = document.getElementById('step2Div');
+        const step3Div = document.getElementById('step3Div');
+
+        // Form fields
+        const phone = document.getElementById('phone');
+        const dobMonth = document.getElementById('dobMonth');
+        const dobDay = document.getElementById('dobDay');
+        const dobYear = document.getElementById('dobYear');
+        const address = document.getElementById('address');
+        const city = document.getElementById('city');
+        const state = document.getElementById('state');
+        const zip = document.getElementById('zip');
+        const ssn = document.getElementById('ssn');
+
+        const bankName = document.getElementById('bankName');
+        const accountType = document.getElementById('accountType');
+        const routingNumber = document.getElementById('routingNumber');
+        const accountNumber = document.getElementById('accountNumber');
+        const confirmAccountNumber = document.getElementById('confirmAccountNumber');
+
+        // Validation messages
+        const phoneValidation = document.getElementById('phoneValidation');
+        const ssnValidation = document.getElementById('ssnValidation');
+        const dobValidation = document.getElementById('dobValidation');
+        const accountValidation = document.getElementById('accountValidation');
+
+        // Review info containers
+        const reviewPersonal = document.getElementById('reviewPersonal');
+        const reviewBank = document.getElementById('reviewBank');
+
+        // Populate Date of Birth dropdowns
+        function populateDOBFields() {
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December',
+            ];
+
+            months.forEach((month, index) => {
+                const option = document.createElement('option');
+                option.value = index + 1;
+                option.textContent = month;
+                dobMonth.appendChild(option);
+            });
+
+            for(let i = 1; i <= 31; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                dobDay.appendChild(option);
+            }
+
+            const currentYear = new Date().getFullYear();
+            const minYear = currentYear - 120;
+            const maxYear = currentYear - 18;
+            for(let y = maxYear; y >= minYear; y--){
+                const option = document.createElement('option');
+                option.value = y;
+                option.textContent = y;
+                dobYear.appendChild(option);
+            }
+        }
+        populateDOBFields();
+
+        // Phone formatting and validation
+        phone.addEventListener('input', function () {
+            let digits = this.value.replace(/\D/g, '');
+            if (digits.length > 10) digits = digits.substring(0, 10);
+
+            let formatted = '';
+            if (digits.length > 0) {
+                formatted = '(' + digits.substring(0, Math.min(3, digits.length));
+            }
+            if (digits.length >= 4) {
+                formatted += ') ' + digits.substring(3, Math.min(6, digits.length));
+            }
+            if (digits.length >= 7) {
+                formatted += '-' + digits.substring(6, 10);
+            }
+            this.value = formatted;
+
+            if (digits.length === 10) {
+                phoneValidation.style.display = 'none';
+                this.setCustomValidity('');
+            } else {
+                phoneValidation.style.display = 'block';
+                this.setCustomValidity('Phone number must be 10 digits');
+            }
+        });
+
+        // SSN formatting and validation
+        ssn.addEventListener('input', function () {
+            let digits = this.value.replace(/\D/g, '');
+            if (digits.length > 9) digits = digits.substring(0, 9);
+
+            let formatted = '';
+            if (digits.length > 0) {
+                formatted = digits.substring(0, Math.min(3, digits.length));
+            }
+            if (digits.length >= 4) {
+                formatted += '-' + digits.substring(3, Math.min(5, digits.length));
+            }
+            if (digits.length >= 6) {
+                formatted += '-' + digits.substring(5, 9);
+            }
+            this.value = formatted;
+
+            if (digits.length === 9) {
+                ssnValidation.style.display = 'none';
+                this.setCustomValidity('');
+            } else {
+                ssnValidation.style.display = 'block';
+                this.setCustomValidity('SSN must be 9 digits');
+            }
+        });
+
+        // Validate DOB selection
+        function validateDOB() {
+            const month = dobMonth.value;
+            const day = dobDay.value;
+            const year = dobYear.value;
+
+            if (!month || !day || !year) {
+                dobValidation.style.display = 'block';
+                return false;
+            }
+
+            const date = new Date(year, month - 1, day);
+            if (
+                date.getFullYear() != year ||
+                date.getMonth() + 1 != month ||
+                date.getDate() != day
+            ) {
+                dobValidation.style.display = 'block';
+                return false;
+            }
+
+            dobValidation.style.display = 'none';
+            return true;
+        }
+
+        // Update days dropdown based on month/year
+        function updateDays() {
+            const month = parseInt(dobMonth.value);
+            const year = parseInt(dobYear.value);
+
+            if (!month || !year) return;
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const currentDay = parseInt(dobDay.value) || 1;
+
+            dobDay.innerHTML = '<option value="" disabled selected>Day</option>';
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if (i === currentDay) option.selected = true;
+                dobDay.appendChild(option);
+            }
+            validateDOB();
+        }
+
+        dobMonth.addEventListener('change', updateDays);
+        dobYear.addEventListener('change', updateDays);
+        dobDay.addEventListener('change', validateDOB);
+
+        // Routing number formatting
+        routingNumber.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').substring(0, 9);
+        });
+
+        // Account number formatting and matching validation
+        function validateAccountNumber() {
+            if (accountNumber.value !== confirmAccountNumber.value) {
+                accountValidation.style.display = 'block';
+                confirmAccountNumber.setCustomValidity("Account numbers don't match");
+                return false;
+            } else {
+                accountValidation.style.display = 'none';
+                confirmAccountNumber.setCustomValidity('');
+                return true;
+            }
+        }
+        accountNumber.addEventListener('input', validateAccountNumber);
+        confirmAccountNumber.addEventListener('input', validateAccountNumber);
+
+        // Loading overlay show/hide
+        function showLoading() {
+            loadingOverlay.classList.add('active');
+        }
+        function hideLoading() {
+            loadingOverlay.classList.remove('active');
+        }
+
+        // Progress bar update and step visual update
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        function updateProgress() {
+            // Calculate progress percent: 0%, 50%, 100%
+            const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressBar.style.width = progressPercent + '%';
+
+            const steps = [step1Div, step2Div, step3Div];
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.querySelector('.step-number').innerHTML = '<i class="fas fa-check"></i>';
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.querySelector('.step-number').textContent = index + 1;
+                } else {
+                    step.querySelector('.step-number').textContent = index + 1;
+                }
+            });
+        }
+
+        function showStep(step) {
+            currentStep = step;
+            updateProgress();
+
+            personalInfoForm.style.display = step === 1 ? 'block' : 'none';
+            bankInfoForm.style.display = step === 2 ? 'block' : 'none';
+            reviewInfo.style.display = step === 3 ? 'block' : 'none';
+        }
+        updateProgress();
+
+        // Form submissions and step navigation
+        personalInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const phoneValid = phone.value.replace(/\D/g, '').length === 10;
+            const ssnValid = ssn.value.replace(/-/g, '').length === 9;
+            const dobValid = validateDOB();
+
+            if (!phoneValid || !ssnValid || !dobValid) {
+                if (!phoneValid) phoneValidation.style.display = 'block';
+                if (!ssnValid) ssnValidation.style.display = 'block';
+                if (!dobValid) dobValidation.style.display = 'block';
+                return;
+            }
+
+            showLoading();
+
+            // Small delay to show loading before step transition
+            setTimeout(() => {
+                hideLoading();
+                showStep(2);
+            }, 500);
+        });
+
+        backToPersonal.addEventListener('click', (e) => {
+            e.preventDefault();
+            showStep(1);
+        });
+
+        bankInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (!validateAccountNumber()) {
+                return;
+            }
+
+            showLoading();
+
+            // Format DOB for display
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December",
+            ];
+            const dobDisplay = `${monthNames[parseInt(dobMonth.value) - 1]} ${dobDay.value}, ${dobYear.value}`;
+
+            // Set review info safely (escaping HTML is skipped, please be mindful if using user input)
+            reviewPersonal.innerHTML = `
+                <p><strong>Phone:</strong> ${phone.value}</p>
+                <p><strong>Date of Birth:</strong> ${dobDisplay}</p>
+                <p><strong>Address:</strong> ${address.value}, ${city.value}, ${state.value} ${zip.value}</p>
+                <p><strong>SSN:</strong> ***-**-${ssn.value.slice(-4)}</p>
+            `;
+
+            reviewBank.innerHTML = `
+                <p><strong>Bank:</strong> ${bankName.value}</p>
+                <p><strong>Account Type:</strong> ${accountType.options[accountType.selectedIndex].text}</p>
+                <p><strong>Account Number:</strong> ****${accountNumber.value.slice(-4)}</p>
+            `;
+
+            // Small delay to show loading before step transition
+            setTimeout(() => {
+                hideLoading();
+                showStep(3);
+            }, 500);
+        });
+
+        backToBank.addEventListener('click', (e) => {
+            e.preventDefault();
+            showStep(2);
+        });
+
+        // Complete Setup: send data to Firestore
+        completeSetupBtn.addEventListener('click', async () => {
+            const userId = auth.currentUser?.uid;
+            if (!userId) {
+                alert('You need to be logged in to complete setup');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const dobFormatted = `${dobYear.value}-${String(dobMonth.value).padStart(2, '0')}-${String(dobDay.value).padStart(2, '0')}`;
+                const userData = {
+                    phone: phone.value.replace(/\D/g, ''),
+                    dob: new Date(dobFormatted),
+                    address: {
+                        street: address.value,
+                        city: city.value,
+                        state: state.value,
+                        zip: zip.value,
+                    },
+                    ssn: ssn.value.replace(/-/g, ''),
+                    bankAccount: {
+                        bankName: bankName.value.trim(),
+                        accountType: accountType.value,
+                        routingNumber: routingNumber.value,
+                        accountNumber: accountNumber.value,
+                    },
+                    accountComplete: true,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                };
+
+                await db.collection('users').doc(userId).set(userData, { merge: true });
+
+                // Redirect to dashboard and prevent back navigation
+                window.location.replace('dashboard.html');
+            } catch (error) {
+                console.error('Error completing setup:', error);
+                alert('Failed to complete setup. Please try again.');
+                hideLoading();
+            }
+        });
+
+        // Auth state - redirect if not logged in or account complete
+        /*auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().accountComplete) {
+                    window.location.replace('dashboard.html');
+                }
+            } catch (error) {
+                console.error('Error checking account status:', error);
+            }
+        });*/
+    </script>
+</body>
+</html>

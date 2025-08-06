@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Details | Easy Stash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #5d9cec;
+            --secondary-blue: #4a89dc;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e6f2ff;
+            --text-muted: #b8c2cc;
+            --success: #48cfad;
+            --warning: #ffaa00;
+            --danger: #ed5565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding-bottom: 30px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--darker-bg);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        .back-button {
+            color: var(--primary-blue);
+            font-size: 20px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--darker-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .select-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d9cec' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 15px;
+        }
+
+        .notice-box {
+            background-color: rgba(255, 170, 0, 0.1);
+            border-left: 3px solid var(--warning);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .notice-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .notice-title i {
+            margin-right: 8px;
+        }
+
+        .notice-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        /* Validation */
+        .validation-message {
+            font-size: 13px;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Action Buttons */
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-secondary {
+            background-color: rgba(93, 156, 236, 0.2);
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            margin-top: 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(93, 156, 236, 0.3);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* Responsive Tweaks */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Saving your information...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="profile.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h1>Easy Stash</h1>
+                </div>
+                <div style="width: 24px;"></div> <!-- Spacer for alignment -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="form-container">
+            <h1 class="form-title">Bank Account Details</h1>
+            
+            <div class="notice-box">
+                <div class="notice-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Important Notice</span>
+                </div>
+                <p class="notice-text">
+                    The bank account must be registered in your exact legal name. 
+                    Loans cannot be disbursed to accounts with mismatched names. 
+                    Double-check your details before submitting.
+                </p>
+            </div>
+            
+            <form id="bankForm">
+                <div class="form-card">
+                    <div class="form-group">
+                        <label for="bankName" class="form-label">Bank Name</label>
+                        <input type="text" id="bankName" class="form-control" placeholder="e.g. Chase, Bank of America" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accountType" class="form-label">Account Type</label>
+                        <select id="accountType" class="form-control select-control" required>
+                            <option value="" disabled selected>Select account type</option>
+                            <option value="checking">Checking Account</option>
+                            <option value="savings">Savings Account</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="routingNumber" class="form-label">Routing Number</label>
+                        <input type="text" id="routingNumber" class="form-control" 
+                               placeholder="9-digit routing number" 
+                               pattern="\d{9}" 
+                               title="Please enter a valid 9-digit routing number" 
+                               required>
+                        <div class="validation-message" id="routingValidation">
+                            Routing number must be exactly 9 digits
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accountNumber" class="form-label">Account Number</label>
+                        <input type="text" id="accountNumber" class="form-control" 
+                               placeholder="Your account number" 
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmAccountNumber" class="form-label">Confirm Account Number</label>
+                        <input type="text" id="confirmAccountNumber" class="form-control" 
+                               placeholder="Re-enter account number" 
+                               required>
+                        <div class="validation-message" id="accountValidation">
+                            Account numbers don't match
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="action-button btn-primary">
+                    <i class="fas fa-save"></i> Save Bank Details
+                </button>
+                <a href="profile.html" class="action-button btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.firebasestorage.app",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const bankForm = document.getElementById('bankForm');
+        const accountNumber = document.getElementById('accountNumber');
+        const confirmAccountNumber = document.getElementById('confirmAccountNumber');
+        const routingNumber = document.getElementById('routingNumber');
+        const routingValidation = document.getElementById('routingValidation');
+        const accountValidation = document.getElementById('accountValidation');
+
+        // Show/hide loading overlay
+        function showLoading() {
+            loadingOverlay.classList.add('active');
+        }
+        function hideLoading() {
+            loadingOverlay.classList.remove('active');
+        }
+
+        // Format routing number (strictly 9 digits)
+        routingNumber.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').substring(0, 9);
+            
+            if (this.value.length === 9) {
+                routingValidation.style.display = 'none';
+                this.setCustomValidity('');
+            } else {
+                routingValidation.style.display = 'block';
+                this.setCustomValidity('Routing number must be exactly 9 digits');
+            }
+        });
+
+        // Format account numbers (digits only)
+        accountNumber.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+            validateAccountNumber();
+        });
+
+        confirmAccountNumber.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+            validateAccountNumber();
+        });
+
+        // Validate account number match
+        function validateAccountNumber() {
+            if (accountNumber.value !== confirmAccountNumber.value) {
+                accountValidation.style.display = 'block';
+                confirmAccountNumber.setCustomValidity("Account numbers don't match");
+                return false;
+            } else {
+                accountValidation.style.display = 'none';
+                confirmAccountNumber.setCustomValidity('');
+                return true;
+            }
+        }
+
+        // Save bank details to Firebase
+        bankForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate inputs
+            if (!validateAccountNumber() || routingNumber.value.length !== 9) {
+                if (routingNumber.value.length !== 9) {
+                    routingValidation.style.display = 'block';
+                    routingNumber.setCustomValidity('Routing number must be exactly 9 digits');
+                    routingNumber.reportValidity();
+                }
+                return;
+            }
+
+            const userId = auth.currentUser?.uid;
+            if (!userId) {
+                alert("You need to be logged in to save bank details");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            showLoading();
+
+            try {
+                // Prepare bank data (no sensitive data stored locally)
+                const bankData = {
+                    bankName: document.getElementById('bankName').value.trim(),
+                    accountType: document.getElementById('accountType').value,
+                    routingNumber: routingNumber.value,
+                    accountNumber: accountNumber.value,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Save to Firestore
+                await db.collection('users').doc(userId).set({
+                    bankAccount: bankData
+                }, { merge: true });
+
+                // Clear form data from memory
+                bankForm.reset();
+                
+                // Redirect to profile page
+                window.location.href = 'profile.html';
+            } catch (error) {
+                console.error("Error saving bank details:", error);
+                alert("Failed to save bank details. Please try again.");
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Load existing bank data if available
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().bankAccount) {
+                    const bank = userDoc.data().bankAccount;
+                    document.getElementById('bankName').value = bank.bankName || '';
+                    document.getElementById('accountType').value = bank.accountType || '';
+                    routingNumber.value = bank.routingNumber || '';
+                    accountNumber.value = ''; // Don't pre-fill account number for security
+                    confirmAccountNumber.value = ''; // Don't pre-fill confirm account number
+                }
+            } catch (error) {
+                console.error("Error loading bank details:", error);
+            }
+        });
+    </script>
+</body>
+</html>
