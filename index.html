@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Stash | Fast Mobile Cash</title>
+    <title>Easy Stash | Fast Mobile Cash Loans in Minutes</title>
     
     <!-- Favicon and App Icons -->
     <link rel="icon" href="icons/icon.192.png" type="image/png">
@@ -15,382 +15,442 @@
     <meta name="theme-color" content="#1a1a2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Get fast mobile cash loans from $100 to $50,000 with Easy Stash. Quick approval, competitive rates, and no hidden fees. Apply in minutes!">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Preload important resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
+    
     <style>
         :root {
-            --primary-blue: #5d9cec;
-            --secondary-blue: #4a89dc;
-            --dark-bg: #1a1a2e;
-            --darker-bg: #16213e;
-            --card-bg: #0f3460;
-            --text-light: #e6f2ff;
-            --text-muted: #b8c2cc;
-            --success: #48cfad;
-            --warning: #ffaa00;
-            --danger: #ed5565;
-        }
+    --primary-blue: #5d9cec;
+    --secondary-blue: #4a89dc;
+    --dark-bg: #1a1a2e;
+    --darker-bg: #16213e;
+    --card-bg: #0f3460;
+    --text-light: #e6f2ff;
+    --text-muted: #b8c2cc;
+    --success: #48cfad;
+    --warning: #ffaa00;
+    --danger: #ed5565;
+    --transition: all 0.3s ease;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            line-height: 1.6;
-            padding-bottom: 80px;
-        }
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    line-height: 1.6;
+    padding-bottom: 80px;
+}
 
-        /* Container with max-width */
-        .container {
-            width: 100%;
-            max-width: 500px; /* Matches dashboard constraint */
-            margin: 0 auto;
-            padding: 0 15px;
-        }
+/* Container with max-width */
+.container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
 
-        /* Header */
-        .header {
-            background-color: var(--darker-bg);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+/* Header */
+.header {
+    background-color: var(--darker-bg);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .logo {
-            display: flex;
-            align-items: center;
-        }
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
 
-        .logo i {
-            color: var(--primary-blue);
-            font-size: 24px;
-            margin-right: 8px;
-        }
+.logo i {
+    color: var(--primary-blue);
+    font-size: 24px;
+    margin-right: 8px;
+    transition: var(--transition);
+}
 
-        .logo h1 {
-            color: var(--text-light);
-            font-size: 20px;
-        }
+.logo h1 {
+    color: var(--text-light);
+    font-size: 20px;
+    font-weight: 700;
+}
 
-        .auth-buttons .btn {
-            margin-left: 10px;
-            font-size: 12px;
-            padding: 8px 12px;
-        }
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
 
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            border-radius: 0 0 20px 20px;
-            padding: 30px 20px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+.btn-primary {
+    background-color: var(--primary-blue);
+    color: white;
+}
 
-        .hero h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
+.btn-primary2 {
+    background-color: white;
+    color: var(--dark-bg);
+}
 
-        .hero p {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
+.btn-primary:hover {
+    background-color: var(--secondary-blue);
+    transform: translateY(-1px);
+}
 
-        /* Loan Calculator */
-        .calculator-tabs {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 15px;
-        }
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--primary-blue);
+    color: var(--primary-blue);
+}
 
-        .tab {
-            padding: 10px 0;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-muted);
-            position: relative;
-            width: 33%;
-            text-align: center;
-        }
+.btn-outline:hover {
+    background-color: rgba(93, 156, 236, 0.1);
+}
 
-        .tab.active {
-            color: var(--primary-blue);
-        }
+/* Header button specific styles */
+.auth-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
 
-        .tab.active:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 25%;
-            width: 50%;
-            height: 3px;
-            background-color: var(--primary-blue);
-            border-radius: 3px;
-        }
+.auth-buttons .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 60px;
+}
 
-        .calculator-form {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
+/* Full width buttons for CTAs */
+.btn-full {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 14px;
+    font-size: 16px;
+}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+/* Transparent button variant for cards */
+.btn-transparent {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+.btn-transparent:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
 
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: var(--darker-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: var(--text-light);
-            font-size: 16px;
-        }
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 0 0 20px 20px;
+    padding: 40px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
 
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
+.hero h2 {
+    font-size: 26px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
 
-        .range-slider {
-            width: 100%;
-            margin-top: 10px;
-        }
+.hero p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 25px;
+}
 
-        .range-values {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+/* Trust Badges */
+.trust-badges {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 25px 0;
+    padding: 15px 0;
+}
 
-        .calculator-result {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            margin-top: 15px;
-        }
+.trust-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 5px 10px;
+}
 
-        .result-amount {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text-light);
-            margin: 5px 0;
-        }
+.trust-badge i {
+    font-size: 24px;
+    color: var(--primary-blue);
+    margin-bottom: 5px;
+}
 
-        .result-text {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
+.trust-badge span {
+    font-size: 11px;
+    text-align: center;
+    color: var(--text-muted);
+}
 
-        /* Features */
-        .features {
-            margin: 30px 0;
-        }
+/* Features */
+.features {
+    margin: 30px 0;
+}
 
-        .section-title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+.section-title {
+    text-align: center;
+    margin-bottom: 25px;
+}
 
-        .section-title h2 {
-            font-size: 20px;
-        }
+.section-title h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
 
-        .section-title p {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+.section-title p {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 80%;
+    margin: 0 auto;
+}
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
 
-        .feature-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            align-items: flex-start;
-        }
+.feature-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+}
 
-        .feature-icon {
-            background-color: rgba(93, 156, 236, 0.1);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: var(--primary-blue);
-            font-size: 18px;
-            flex-shrink: 0;
-        }
+.feature-icon {
+    background-color: rgba(93, 156, 236, 0.1);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--primary-blue);
+    font-size: 18px;
+    flex-shrink: 0;
+}
 
-        .feature-content h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
+.feature-content h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
 
-        .feature-content p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+.feature-content p {
+    font-size: 14px;
+    color: var(--text-muted);
+}
 
-        /* Testimonials */
-        .testimonial-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
+/* How It Works */
+.steps-container {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+}
 
-        .testimonial-text {
-            font-style: italic;
-            margin-bottom: 15px;
-            position: relative;
-        }
+.step {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
 
-        .testimonial-text:before {
-            content: '"';
-            font-size: 40px;
-            color: var(--primary-blue);
-            opacity: 0.3;
-            position: absolute;
-            left: -10px;
-            top: -15px;
-        }
+.step-number {
+    background-color: var(--primary-blue);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
 
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-        }
+.step-content h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
 
-        .author-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-blue);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            font-weight: bold;
-        }
+.step-content p {
+    font-size: 14px;
+    color: var(--text-muted);
+}
 
-        .author-info h4 {
-            font-size: 14px;
-            margin-bottom: 3px;
-        }
+/* Simple Trust Signal */
+.trust-signal {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 14px;
+    color: var(--text-muted);
+}
 
-        .author-info p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+.trust-signal i {
+    color: var(--primary-blue);
+    margin-right: 5px;
+}
 
-        /* CTA Section */
-        .cta {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-align: center;
-            margin: 30px 0;
-        }
+/* CTA Section */
+.cta {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    margin: 30px 0;
+}
 
-        .cta h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
+.cta h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
 
-        .cta p {
-            font-size: 14px;
-            margin-bottom: 20px;
-            opacity: 0.9;
-        }
+.cta p {
+    font-size: 15px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
 
-        .btn {
-            display: inline-block;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            text-align: center;
-            text-decoration: none;
-            border: none;
-            font-size: 14px;
-        }
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--darker-bg);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+}
 
-        .btn-primary {
-            background-color: white;
-            color: var(--primary-blue);
-        }
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 10px;
+}
 
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid white;
-            color: white;
-            margin-left: 10px;
-        }
+.nav-item i {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
 
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--darker-bg);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
+.nav-item.active {
+    color: var(--primary-blue);
+}
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 10px;
-        }
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .header-content {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    
+    .auth-buttons {
+        gap: 6px;
+    }
+    
+    .auth-buttons .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 55px;
+    }
+    
+    .logo h1 {
+        font-size: 18px;
+    }
+    
+    .logo i {
+        font-size: 20px;
+    }
+}
 
-        .nav-item i {
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
+@media (max-width: 400px) {
+    .hero h2 {
+        font-size: 22px;
+    }
+    
+    .hero p {
+        font-size: 15px;
+    }
+    
+    .auth-buttons .btn {
+        padding: 5px 8px;
+        font-size: 11px;
+        min-width: 50px;
+    }
+    
+    .trust-badge {
+        width: 45%;
+        margin-bottom: 10px;
+    }
+}
 
-        .nav-item.active {
-            color: var(--primary-blue);
-        }
+@media (max-width: 360px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .header {
+        padding: 12px 0;
+    }
+    
+    .auth-buttons .btn {
+        padding: 4px 6px;
+        font-size: 10px;
+        min-width: 45px;
+    }
+    
+    .logo h1 {
+        font-size: 16px;
+    }
+}
     </style>
 </head>
 <body>
@@ -398,13 +458,13 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo">
+                <a href="#" class="logo">
                     <i class="fas fa-hand-holding-usd"></i>
                     <h1>Easy Stash</h1>
-                </div>
+                </a>
                 <div class="auth-buttons">
-                    <a href="login.html" class="btn btn-outline" style="color: var(--text-light); border-color: var(--primary-blue);">Login</a>
-                    <a href="signup.html" class="btn btn-primary" style="background-color: var(--primary-blue); color: white;">Sign Up</a>
+                    <a href="login.html" class="btn btn-outline">Login</a>
+                    <a href="signup.html" class="btn btn-primary">Sign Up</a>
                 </div>
             </div>
         </div>
@@ -413,57 +473,26 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h2>Cash When You Need It</h2>
-            <p>Borrow up to $50,000 with low rates and fast approval</p>
-            <a href="#" class="btn btn-primary">Apply Now</a>
+            <h2>Get the Cash You Need Today</h2>
+            <p>Borrow $100-$50,000 with competitive rates and instant approval decisions</p>
+            <a href="signup.html" class="btn btn-primary2">Apply Now - It's Simple</a>
         </div>
     </section>
 
-    <!-- Loan Calculator -->
+    <!-- Trust Badges -->
     <div class="container">
-        <div class="calculator-tabs">
-            <div class="tab active">Personal</div>
-            <div class="tab">Business</div>
-            <div class="tab">Auto</div>
-        </div>
-        
-        <div class="calculator-form">
-            <div class="form-group">
-                <label for="loan-amount">How much do you need?</label>
-                <div class="range-slider">
-                    <input type="range" id="loan-amount" min="1000" max="50000" step="100" value="10000" class="form-control">
-                    <div class="range-values">
-                        <span>$1,000</span>
-                        <span>$50,000</span>
-                    </div>
-                </div>
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>256-bit SSL Secure</span>
             </div>
-            
-            <div class="form-group">
-                <label for="loan-purpose">Loan Purpose</label>
-                <select id="loan-purpose" class="form-control">
-                    <option>Debt Consolidation</option>
-                    <option>Emergency Expense</option>
-                    <option>Home Improvement</option>
-                    <option>Other</option>
-                </select>
+            <div class="trust-badge">
+                <i class="fas fa-lock"></i>
+                <span>Data Protected</span>
             </div>
-            
-            <div class="form-group">
-                <label for="credit-score">Credit Score</label>
-                <select id="credit-score" class="form-control">
-                    <option>Excellent (720+)</option>
-                    <option>Good (680-719)</option>
-                    <option>Fair (640-679)</option>
-                    <option>I don't know</option>
-                </select>
-            </div>
-            
-            <div class="calculator-result">
-                <p class="result-text">Estimated monthly payment</p>
-                <div class="result-amount">$245</div>
-                <p class="result-text">APR: 5.99% - 24.99%</p>
-                <a href="#" class="btn btn-primary" style="width: 100%;">Get Your Cash</a>
+            <div class="trust-badge">
+                <i class="fas fa-check-circle"></i>
+                <span>Trusted Lender</span>
             </div>
         </div>
     </div>
@@ -473,7 +502,7 @@
         <div class="container">
             <div class="section-title">
                 <h2>Why Choose Easy Stash?</h2>
-                <p>We make borrowing simple and stress-free</p>
+                <p>We make borrowing simple, fast, and secure</p>
             </div>
             
             <div class="features-grid">
@@ -483,7 +512,7 @@
                     </div>
                     <div class="feature-content">
                         <h3>Lightning Fast</h3>
-                        <p>Get approved in minutes and receive funds as soon as tomorrow</p>
+                        <p>Get approved in minutes and receive funds as soon as the next business day</p>
                     </div>
                 </div>
                 
@@ -493,7 +522,7 @@
                     </div>
                     <div class="feature-content">
                         <h3>Secure & Private</h3>
-                        <p>Bank-level encryption protects your personal information</p>
+                        <p>Bank-level 256-bit encryption protects your personal information</p>
                     </div>
                 </div>
                 
@@ -503,28 +532,51 @@
                     </div>
                     <div class="feature-content">
                         <h3>No Hidden Fees</h3>
-                        <p>Clear terms with no prepayment penalties or surprises</p>
+                        <p>Clear terms with no prepayment penalties or surprise charges</p>
                     </div>
                 </div>
-                
-                
             </div>
         </div>
     </section>
 
-    <!-- Testimonial -->
+    <!-- How It Works -->
     <div class="container">
-        <div class="testimonial-card">
-            <div class="testimonial-text">
-                I needed emergency car repairs and Easy Stash got me $3,000 the same day. The app was so easy to use and the payment terms were fair.
+        <div class="steps-container">
+            <div class="section-title" style="margin-bottom: 20px;">
+                <h2>How It Works</h2>
+                <p>Get your money in just 3 simple steps</p>
             </div>
-            <div class="testimonial-author">
-                <div class="author-avatar">SD</div>
-                <div class="author-info">
-                    <h4>Sarah D.</h4>
-                    <p>Chicago, IL</p>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Complete Your Application</h3>
+                    <p>Fill out our simple online form in minutes - no paperwork needed</p>
                 </div>
             </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Get a Quick Approval</h3>
+                    <p>Receive a fast decision without affecting your credit score</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Receive Your Funds</h3>
+                    <p>Money deposited directly to your account as soon as the next business day</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Trust Signal -->
+    <div class="container">
+        <div class="trust-signal">
+            <i class="fas fa-users"></i> Trusted by thousands of Americans every month
         </div>
     </div>
 
@@ -533,8 +585,7 @@
         <div class="cta">
             <h2>Ready to get started?</h2>
             <p>Apply in minutes without affecting your credit score</p>
-            <a href="#" class="btn btn-primary">Apply Now</a>
-            <a href="#" class="btn btn-outline">Learn More</a>
+            <a href="signup.html" class="btn btn-primary2">Apply Now - It's Simple</a>
         </div>
     </div>
 
@@ -544,18 +595,43 @@
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="login.html" class="nav-item">
             <i class="fas fa-hand-holding-usd"></i>
             <span>Loans</span>
         </a>
-        <a href="#" class="nav-item">
-            <i class="fas fa-calculator"></i>
-            <span>Calculator</span>
-        </a>
-        <a href="#" class="nav-item">
+        <a href="login.html" class="nav-item">
             <i class="fas fa-user"></i>
             <span>Account</span>
         </a>
     </nav>
+
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdI5kWCwGlxayGqAAy9TNRfCI9MrWf6es",
+            authDomain: "easy-stash.firebaseapp.com",
+            projectId: "easy-stash",
+            storageBucket: "easy-stash.appspot.com",
+            messagingSenderId: "12483019",
+            appId: "1:12483019:web:5f7c929706fa6d5fa19e4e",
+            measurementId: "G-FPK26FLF7V"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Auth state listener
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, redirect to finish.html
+                window.location.href = "finish.html";
+            }
+            // If user is not signed in, stay on current page
+        });
+    </script>
 </body>
 </html>

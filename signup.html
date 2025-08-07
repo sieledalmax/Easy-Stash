@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | Easy Stash</title>
+
+    <!-- Favicon and App Icons -->
+    <link rel="icon" href="icons/icon.192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icons/icon.192.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Same CSS as login page */
@@ -421,7 +426,7 @@
                 });
                 console.log("User data saved successfully");
                 // Redirect to dashboard or welcome page
-                window.location.href = 'dashboard.html';
+                window.location.href = 'finish.html';
             } catch (error) {
                 console.error("Error saving user data: ", error);
                 throw new Error("We couldn't save your profile data. Please try again.");
