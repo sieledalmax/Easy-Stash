@@ -617,19 +617,6 @@
                 </div>
                 <div class="error-message" id="term-error">Please select a loan term</div>
             </div>
-
-            <div class="form-group">
-                <label for="credit-score">Estimated Credit Score</label>
-                <select id="credit-score" class="form-control" required>
-                    <option value="" disabled selected>Select range</option>
-                    <option value="Excellent (720+)">Excellent (720+)</option>
-                    <option value="Good (680-719)">Good (680-719)</option>
-                    <option value="Fair (640-679)">Fair (640-679)</option>
-                    <option value="Poor (639 or below)">Poor (639 or below)</option>
-                    <option value="I don't know">I don't know</option>
-                </select>
-                <div class="error-message" id="credit-error">Please select your credit score range</div>
-            </div>
         </div>
 
         <button id="continue-btn" class="btn btn-primary">Continue to Finances</button>
@@ -666,7 +653,6 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const continueBtn = document.getElementById('continue-btn');
         const loanAmount = document.getElementById('loan-amount');
-        const creditScore = document.getElementById('credit-score');
         const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
         const userAvatar = document.querySelector('.user-avatar');
@@ -674,7 +660,6 @@
         // Error elements
         const purposeError = document.getElementById('purpose-error');
         const amountError = document.getElementById('amount-error');
-        const creditError = document.getElementById('credit-error');
         const termError = document.getElementById('term-error');
 
         // Category and purpose elements
@@ -718,7 +703,6 @@
             // Reset errors
             purposeError.style.display = 'none';
             amountError.style.display = 'none';
-            creditError.style.display = 'none';
             termError.style.display = 'none';
 
             // Validate loan purpose
@@ -743,12 +727,6 @@
                     amountError.style.display = 'block';
                     isValid = false;
                 }
-            }
-
-            // Validate credit score
-            if (!creditScore.value) {
-                creditError.style.display = 'block';
-                isValid = false;
             }
 
             return isValid;
@@ -825,7 +803,6 @@
                 loanCategory: selectedCategory,
                 loanPurpose: selectedPurpose,
                 loanAmount: loanAmount.value,
-                creditScore: creditScore.value,
                 loanTerm: selectedTerm
             };
             
@@ -875,7 +852,6 @@
                     
                     // Set other fields
                     if (formData.loanAmount) loanAmount.value = formData.loanAmount;
-                    if (formData.creditScore) creditScore.value = formData.creditScore;
                     if (formData.loanTerm) {
                         document.querySelector(`.term-option[data-term="${formData.loanTerm}"]`).click();
                     }

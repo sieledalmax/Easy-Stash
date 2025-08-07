@@ -219,12 +219,25 @@
         .detail-row {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 8px;
             font-size: 14px;
+            gap: 15px; /* Minimum space between label and value */
         }
 
         .detail-label {
             color: var(--text-muted);
+            min-width: 90px; /* Minimum width for labels */
+            flex-shrink: 0; /* Prevents label from shrinking */
+        }
+
+        .detail-value {
+            flex: 1;
+            text-align: right;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: calc(100% - 105px); /* Ensures it doesn't exceed available space */
         }
 
         /* Loan Offer */
@@ -410,41 +423,41 @@
         }
 
         /* Loading Overlay */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
 
-.loading-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
 
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    border-top-color: var(--primary-blue);
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 15px;
-}
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -521,10 +534,6 @@
                     <span class="detail-label">Term</span>
                     <span id="reviewTerm">Not specified</span>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Credit Score</span>
-                    <span id="reviewCredit">Not specified</span>
-                </div>
             </div>
 
             <div class="review-section">
@@ -587,7 +596,6 @@
 
         <p class="footer-text">
             Your information is secured with 256-bit encryption. We'll perform a soft credit check.
-            Processing fees will be deducted from your loan amount upon disbursement.
         </p>
     </div>
 
@@ -823,10 +831,6 @@
                     document.getElementById('monthlyPayment').textContent = 
                         `Monthly Payment: ${formatCurrency(monthly)}`;
                 }
-            }
-            
-            if (appData.creditScore) {
-                document.getElementById('reviewCredit').textContent = appData.creditScore;
             }
             
             // Display financial information
