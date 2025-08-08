@@ -123,27 +123,6 @@
             position: relative;
         }
 
-        .progress-steps:before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: var(--card-bg);
-            z-index: 1;
-        }
-
-        .progress-bar {
-            position: absolute;
-            top: 15px;
-            left: 0;
-            height: 3px;
-            background-color: var(--primary-blue);
-            z-index: 2;
-            width: 100%;
-        }
-
         .step {
             display: flex;
             flex-direction: column;
@@ -222,13 +201,13 @@
             align-items: flex-start;
             margin-bottom: 8px;
             font-size: 14px;
-            gap: 15px; /* Minimum space between label and value */
+            gap: 15px;
         }
 
         .detail-label {
             color: var(--text-muted);
-            min-width: 90px; /* Minimum width for labels */
-            flex-shrink: 0; /* Prevents label from shrinking */
+            min-width: 90px;
+            flex-shrink: 0;
         }
 
         .detail-value {
@@ -237,7 +216,7 @@
             word-wrap: break-word;
             word-break: break-word;
             overflow-wrap: break-word;
-            max-width: calc(100% - 105px); /* Ensures it doesn't exceed available space */
+            max-width: calc(100% - 105px);
         }
 
         /* Loan Offer */
@@ -360,66 +339,19 @@
             margin-top: 20px;
         }
 
-        /* Payment Modal */
-        .payment-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .payment-modal-content {
-            background-color: var(--darker-bg);
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        .payment-modal h3 {
-            margin-bottom: 20px;
-            color: var(--primary-blue);
-        }
-
-        .payment-modal p {
-            margin-bottom: 25px;
-        }
-
-        .payment-modal .btn {
-            margin-top: 20px;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        /* Loading spinner */
+        /* Spinner Styles */
         .spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            margin: 20px auto;
-            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border-top: 4px solid var(--primary-blue);
-            animation: spin 1s linear infinite;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Loading Overlay */
@@ -445,18 +377,79 @@
             visibility: visible;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--primary-blue);
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 15px;
+        .loading-text {
+            color: white;
+            font-size: 16px;
+            margin-top: 10px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            width: 85%;
+            max-width: 350px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-body {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 25px;
+            border-radius: 25px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn:hover {
+            background-color: var(--secondary-blue);
         }
     </style>
 </head>
@@ -474,14 +467,14 @@
     </header>
 
     <!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-    <div class="spinner"></div>
-</div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
 
     <div class="container">
         <!-- Progress Steps -->
         <div class="progress-steps">
-            <div class="progress-bar"></div>
             <div class="step completed">
                 <div class="step-number"><i class="fas fa-check"></i></div>
                 <div class="step-label">Loan Details</div>
@@ -600,14 +593,18 @@
     </div>
 
     <!-- Payment Modal -->
-    <div class="payment-modal" id="paymentModal">
-        <div class="payment-modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            <h3>Pay Processing Fee</h3>
-            <p>Please complete payment of <span id="processingFeeAmount">$0.00</span> to submit your application.</p>
-            <div id="paystackEmbedContainer"></div>
-            <div class="spinner" id="paymentSpinner"></div>
-            <p id="paymentStatus"></p>
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="spinner" id="paymentSpinner"></div>
+                <h3>Payment Status</h3>
+            </div>
+            <div class="modal-body">
+                <p id="paymentMessage">Processing your payment request...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="paymentOkBtn" style="display: none;">Okay</button>
+            </div>
         </div>
     </div>
 
@@ -637,8 +634,10 @@
     const paystackPublicKey = 'pk_test_50f796e5105a79f318cf2e6edbf73da1d7ce8608';
 
     // Show loading overlay
-    function showLoading() {
-        document.getElementById('loadingOverlay').classList.add('active');
+    function showLoading(message = "Processing...") {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.querySelector('.loading-text').textContent = message;
+        overlay.classList.add('active');
     }
 
     // Hide loading overlay
@@ -864,10 +863,8 @@
                 }
             }
             
-
-// ✅ SAVE the loaded appData to Firestore
-await savePendingApplication(user, appData);
-
+            // Save the loaded appData to Firestore
+            await savePendingApplication(user, appData);
             
         } catch (error) {
             console.error('Error loading application data:', error);
@@ -956,14 +953,9 @@ await savePendingApplication(user, appData);
 
         // Modal controls
         const paymentModal = document.getElementById('paymentModal');
-        const closeModal = document.getElementById('closeModal');
-        const processingFeeAmount = document.getElementById('processingFeeAmount');
         const paymentSpinner = document.getElementById('paymentSpinner');
-        const paymentStatus = document.getElementById('paymentStatus');
-
-        closeModal.addEventListener('click', function() {
-            paymentModal.style.display = 'none';
-        });
+        const paymentMessage = document.getElementById('paymentMessage');
+        const paymentOkBtn = document.getElementById('paymentOkBtn');
 
         // Button event listeners
         document.getElementById('backBtn').addEventListener('click', function() {
@@ -983,47 +975,48 @@ await savePendingApplication(user, appData);
                 return;
             }
 
-            const processingFee = parseFloat(selectedOption.dataset.fee);
-            processingFeeAmount.textContent = formatCurrency(processingFee);
-
-            // Show payment modal
-            paymentModal.style.display = 'flex';
-            paymentStatus.textContent = '';
-            paymentSpinner.style.display = 'none';
-
             try {
                 // Ensure we have the latest data in Firestore
                 const appData = JSON.parse(sessionStorage.getItem('loanApplication') || '{}');
                 const docId = await savePendingApplication(user, appData);
                 
+                // Show payment modal with spinner
+                paymentModal.classList.add('show');
+                paymentMessage.textContent = 'Processing payment...';
+                paymentSpinner.style.display = 'block';
+                paymentOkBtn.style.display = 'none';
+                
                 // Initialize Paystack payment
-                initializePaystackPayment(user.email, processingFee, async (error, response) => {
-                    if (error) {
-                        paymentStatus.textContent = error;
-                        paymentStatus.style.color = 'var(--danger)';
-                        return;
-                    }
+                initializePaystackPayment(user.email, parseFloat(selectedOption.dataset.fee), 
+                    async (error, response) => {
+                        if (error) {
+                            paymentMessage.textContent = error;
+                            paymentMessage.style.color = 'var(--danger)';
+                            paymentSpinner.style.display = 'none';
+                            return;
+                        }
 
-                    paymentSpinner.style.display = 'block';
-                    paymentStatus.textContent = 'Processing payment...';
-                    paymentStatus.style.color = 'var(--primary-blue)';
-
-                    try {
-                        await updateApplicationStatus(docId, response.reference);
-                        paymentStatus.textContent = 'Payment successful! Redirecting...';
-                        setTimeout(() => {
-                            window.location.href = 'review.html';
-                        }, 1500);
-                    } catch (submitError) {
-                        paymentSpinner.style.display = 'none';
-                        paymentStatus.textContent = 'Application update failed. Please contact support.';
-                        paymentStatus.style.color = 'var(--danger)';
-                        console.error('Submission error:', submitError);
-                    }
-                });
+                        try {
+                            await updateApplicationStatus(docId, response.reference);
+                            paymentMessage.textContent = 'Payment successful! Redirecting...';
+                            paymentMessage.style.color = 'var(--success)';
+                            paymentSpinner.style.display = 'none';
+                            
+                            setTimeout(() => {
+                                window.location.href = 'dashboard.html';
+                            }, 1500);
+                        } catch (submitError) {
+                            paymentSpinner.style.display = 'none';
+                            paymentMessage.textContent = 'Application update failed. Please contact support.';
+                            paymentMessage.style.color = 'var(--danger)';
+                            console.error('Submission error:', submitError);
+                        }
+                    });
             } catch (paymentError) {
-                paymentStatus.textContent = 'Error initializing payment. Please try again.';
-                paymentStatus.style.color = 'var(--danger)';
+                paymentModal.classList.add('show');
+                paymentMessage.textContent = 'Error initializing payment. Please try again.';
+                paymentMessage.style.color = 'var(--danger)';
+                paymentSpinner.style.display = 'none';
                 console.error('Payment error:', paymentError);
             }
         });
@@ -1031,7 +1024,7 @@ await savePendingApplication(user, appData);
         // Close modal when clicking outside
         window.addEventListener('click', function(event) {
             if (event.target === paymentModal) {
-                paymentModal.style.display = 'none';
+                paymentModal.classList.remove('show');
             }
         });
     });
