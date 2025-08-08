@@ -22,7 +22,6 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
     
     <style>
-        <style>
         :root {
     --primary-blue: #5d9cec;
     --secondary-blue: #4a89dc;
@@ -194,37 +193,33 @@ body {
     margin-bottom: 25px;
 }
 
-/* Trust Badges - Modified for horizontal layout */
+/* Trust Badges */
 .trust-badges {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
+    flex-wrap: wrap;
     margin: 25px 0;
     padding: 15px 0;
-    gap: 10px;
 }
 
 .trust-badge {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1;
-    min-width: 0;
+    margin: 5px 10px;
 }
 
 .trust-badge i {
-    font-size: 20px;
+    font-size: 24px;
     color: var(--primary-blue);
     margin-bottom: 5px;
 }
 
 .trust-badge span {
-    font-size: 10px;
+    font-size: 11px;
     text-align: center;
     color: var(--text-muted);
-    line-height: 1.2;
-    word-wrap: break-word;
-    hyphens: auto;
 }
 
 /* Features */
@@ -414,15 +409,6 @@ body {
     .logo i {
         font-size: 20px;
     }
-    
-    /* Trust badges remain horizontal on mobile */
-    .trust-badge i {
-        font-size: 18px;
-    }
-    
-    .trust-badge span {
-        font-size: 9px;
-    }
 }
 
 @media (max-width: 400px) {
@@ -440,19 +426,9 @@ body {
         min-width: 50px;
     }
     
-    /* Trust badges adjustments for very small screens */
-    .trust-badges {
-        gap: 5px;
-        padding: 10px 0;
-    }
-    
-    .trust-badge i {
-        font-size: 16px;
-        margin-bottom: 3px;
-    }
-    
-    .trust-badge span {
-        font-size: 8px;
+    .trust-badge {
+        width: 45%;
+        margin-bottom: 10px;
     }
 }
 
@@ -474,22 +450,7 @@ body {
     .logo h1 {
         font-size: 16px;
     }
-    
-    /* Trust badges for extra small screens */
-    .trust-badges {
-        gap: 2px;
-        padding: 8px 0;
-    }
-    
-    .trust-badge i {
-        font-size: 14px;
-        margin-bottom: 2px;
-    }
-    
-    .trust-badge span {
-        font-size: 7px;
-        line-height: 1.1;
-    }
+}
     </style>
 </head>
 <body>
