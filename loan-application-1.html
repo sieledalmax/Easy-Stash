@@ -250,6 +250,20 @@
             padding-left: 28px;
         }
 
+        .amount-limits {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .amount-limits i {
+            color: var(--primary-blue);
+            font-size: 10px;
+        }
+
         .term-options {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -600,9 +614,13 @@
             <div class="form-group">
                 <label for="loan-amount">Loan Amount</label>
                 <div class="amount-input-container">
-                    <input type="number" id="loan-amount" class="form-control" placeholder="500" min="100" max="14900">
+                    <input type="number" id="loan-amount" class="form-control" placeholder="100" min="100" max="5000">
                 </div>
-                <div class="error-message" id="amount-error">Please enter an amount between $100 and $14,900</div>
+                <div class="amount-limits" id="amount-limits">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Amount range: $100 - $5,000</span>
+                </div>
+                <div class="error-message" id="amount-error">Please enter an amount between $100 and $5,000</div>
             </div>
 
             <div class="form-group">
@@ -653,6 +671,7 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const continueBtn = document.getElementById('continue-btn');
         const loanAmount = document.getElementById('loan-amount');
+        const amountLimits = document.getElementById('amount-limits');
         const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
         const userAvatar = document.querySelector('.user-avatar');
@@ -671,6 +690,16 @@
         let selectedCategory = 'everyday';
         let selectedPurpose = '';
         let selectedTerm = '2 weeks';
+
+        // Function to update amount limits display
+        function updateAmountLimits(minAmount, maxAmount) {
+            const formattedMin = new Intl.NumberFormat().format(minAmount);
+            const formattedMax = new Intl.NumberFormat().format(maxAmount);
+            amountLimits.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <span>Amount range: $${formattedMin} - $${formattedMax}</span>
+            `;
+        }
 
         // Show loading overlay
         function showLoading() {
@@ -723,7 +752,9 @@
                 const maxAmount = parseInt(activeTab.dataset.max);
                 
                 if (amount < minAmount || amount > maxAmount) {
-                    amountError.textContent = `Please enter an amount between $${minAmount} and $${maxAmount}`;
+                    const formattedMin = new Intl.NumberFormat().format(minAmount);
+                    const formattedMax = new Intl.NumberFormat().format(maxAmount);
+                    amountError.textContent = `Please enter an amount between $${formattedMin} and $${formattedMax}`;
                     amountError.style.display = 'block';
                     isValid = false;
                 }
@@ -742,13 +773,16 @@
                 
                 // Get category and limits
                 selectedCategory = this.dataset.category;
-                const minAmount = this.dataset.min;
-                const maxAmount = this.dataset.max;
+                const minAmount = parseInt(this.dataset.min);
+                const maxAmount = parseInt(this.dataset.max);
                 
                 // Update amount input limits
                 loanAmount.min = minAmount;
                 loanAmount.max = maxAmount;
-                loanAmount.placeholder = minAmount;
+                loanAmount.placeholder = minAmount.toString();
+                
+                // Update the amount limits display
+                updateAmountLimits(minAmount, maxAmount);
                 
                 // Hide all purpose options and hints
                 document.querySelectorAll('.purpose-options, .amount-hint').forEach(el => {
