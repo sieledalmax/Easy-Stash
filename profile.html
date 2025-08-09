@@ -423,9 +423,6 @@
                     <span class="info-label">Email Address</span>
                     <div>
                         <span class="info-value" id="securityEmail">Loading...</span>
-                        <span class="verification-status">
-                            <span class="status-badge verified">Verified</span>
-                        </span>
                     </div>
                 </div>
                 <div class="info-row">
@@ -696,7 +693,7 @@
     // Handle logout
     logoutButton.addEventListener('click', () => {
         auth.signOut().then(() => {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }).catch((error) => {
             console.error("Logout error:", error);
             alert("Failed to log out. Please try again.");
