@@ -159,17 +159,12 @@
             transition: all 0.3s;
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
         .btn-primary {
             background-color: var(--primary-blue);
             color: white;
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             background-color: #4a89dc;
         }
 
@@ -177,21 +172,11 @@
             background-color: white;
             color: #333;
             margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-google:hover:not(:disabled) {
-            background-color: #f8f9fa;
         }
 
         .btn-apple {
             background-color: black;
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .btn-icon {
@@ -333,6 +318,21 @@
             margin-left: 10px;
         }
 
+        /* Password Strength Indicator */
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            background-color: var(--darker-bg);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-meter {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
         /* Toast Notification */
         .toast {
             position: fixed;
@@ -413,17 +413,16 @@
 
                 <!-- Social Login Buttons -->
                 <button id="google-login" class="btn btn-google">
-                    <i class="fab fa-google btn-icon"></i>
-                    <span>Continue with Google</span>
+                    <i class="fab fa-google btn-icon"></i> Continue with Google
                 </button>
                 <button id="apple-login" class="btn btn-apple">
-                    <i class="fab fa-apple btn-icon"></i>
-                    <span>Continue with Apple</span>
+                    <i class="fab fa-apple btn-icon"></i> Continue with Apple
                 </button>
-            </div>
 
-            <div class="auth-footer">
+                <div class="auth-footer">
                 Don't have an account? <a href="signup.html">Sign up</a>
+            </div>
+            
             </div>
         </main>
     </div>
@@ -446,10 +445,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs - Updated versions -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     
     <script>
         // Firebase configuration
@@ -561,21 +560,25 @@
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Update last login time in Firestore
-                try {
-                    await db.collection('users').doc(user.uid).update({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch (dbError) {
-                    console.warn("Could not update last login time:", dbError);
+                // Check if email is verified
+                if (!user.emailVerified) {
+                    // Optionally: Send verification email again or show message
+                    /*showToast("Please verify your email address. Check your inbox.", "warning", 5000);
+                    await auth.signOut();
+                    return;*/
                 }
+                
+                // Update last login time in Firestore
+                await db.collection('users').doc(user.uid).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
                 // Show success message before redirect
                 showToast("Login successful! Redirecting...", "success");
                 
                 // Redirect to dashboard after short delay
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'finish.html';
                 }, 1500);
                 
             } catch (error) {
@@ -618,76 +621,44 @@
             }
         });
 
-        // Google login with enhanced error handling and debugging
+        // Google login with enhanced error handling
         googleLoginButton.addEventListener('click', async () => {
-            console.log("Google login button clicked");
-            
             try {
-                // Show loading state
-                googleLoginButton.disabled = true;
-                googleLoginButton.innerHTML = '<i class="fab fa-google btn-icon"></i><span>Signing in...</span>';
+                showLoading(googleLoginButton, 
+                    googleLoginButton.querySelector('.btn-icon').nextSibling, 
+                    null);
                 
-                // Clear any previous errors
-                loginError.style.display = 'none';
-                
-                console.log("Creating Google Auth Provider...");
                 const provider = new firebase.auth.GoogleAuthProvider();
-                
-                // Add additional scopes
+                // Add additional scopes if needed
                 provider.addScope('profile');
                 provider.addScope('email');
                 
-                // Set custom parameters
-                provider.setCustomParameters({
-                    prompt: 'select_account'
-                });
-                
-                console.log("Attempting sign in with popup...");
                 const result = await auth.signInWithPopup(provider);
                 const user = result.user;
-                const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
-                
-                console.log("Google login successful:", user.email);
                 
                 // Check if user exists in Firestore
-                let userDoc;
-                try {
-                    userDoc = await db.collection('users').doc(user.uid).get();
-                } catch (dbError) {
-                    console.warn("Could not check user in database:", dbError);
-                }
+                const userDoc = await db.collection('users').doc(user.uid).get();
                 
-                if (userDoc && !userDoc.exists) {
+                if (!userDoc.exists) {
                     // If new user, save their data
                     const name = user.displayName || "Google User";
-                    try {
-                        await db.collection('users').doc(user.uid).set({
-                            uid: user.uid,
-                            email: user.email,
-                            name: name,
-                            photoURL: user.photoURL || null,
-                            provider: 'google',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                            emailVerified: true
-                        });
-                        showToast("Welcome to Easy Stash!", "success");
-                    } catch (dbError) {
-                        console.warn("Could not save user data:", dbError);
-                        showToast("Signed in successfully!", "success");
-                    }
-                } else if (userDoc) {
-                    // Update last login time
-                    try {
-                        await db.collection('users').doc(user.uid).update({
-                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    } catch (dbError) {
-                        console.warn("Could not update last login:", dbError);
-                    }
-                    showToast("Welcome back!", "success");
+                    await db.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        email: user.email,
+                        name: name,
+                        photoURL: user.photoURL || null,
+                        provider: 'google',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        emailVerified: true
+                    });
+                    
+                    showToast("Welcome to Easy Stash!", "success");
                 } else {
-                    showToast("Signed in successfully!", "success");
+                    // Update last login time
+                    await db.collection('users').doc(user.uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                 }
                 
                 // Redirect to dashboard after short delay
@@ -696,51 +667,33 @@
                 }, 1000);
                 
             } catch (error) {
-                console.error("Google login error:", error);
-                console.error("Error code:", error.code);
-                console.error("Error message:", error.message);
+                console.error("Google login error: ", error);
                 
                 let errorMessage = "An error occurred during Google login.";
                 
                 switch (error.code) {
                     case 'auth/popup-closed-by-user':
-                        errorMessage = "Login was canceled by user.";
+                        errorMessage = "Login was canceled.";
                         break;
                     case 'auth/network-request-failed':
-                        errorMessage = "Network error. Please check your connection and try again.";
+                        errorMessage = "Network error. Please check your connection.";
                         break;
                     case 'auth/cancelled-popup-request':
-                        errorMessage = "Another login request is already in progress.";
+                        errorMessage = "Only one popup request is allowed at a time.";
                         break;
                     case 'auth/popup-blocked':
-                        errorMessage = "Popup was blocked by your browser. Please allow popups for this site and try again.";
+                        errorMessage = "Popup was blocked by your browser. Please allow popups for this site.";
                         break;
                     case 'auth/unauthorized-domain':
-                        errorMessage = "This domain is not authorized for Google login. Please contact support.";
+                        errorMessage = "This domain is not authorized for Google login.";
                         break;
-                    case 'auth/operation-not-allowed':
-                        errorMessage = "Google login is not enabled. Please contact support.";
-                        break;
-                    case 'auth/invalid-api-key':
-                        errorMessage = "Invalid API configuration. Please contact support.";
-                        break;
-                    case 'auth/app-deleted':
-                        errorMessage = "Firebase app configuration error. Please contact support.";
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = "Too many requests. Please wait a moment and try again.";
-                        break;
-                    default:
-                        errorMessage = `Google login failed: ${error.message}`;
                 }
                 
-                showToast(errorMessage, "error", 5000);
-                showError(errorMessage);
-                
+                showToast(errorMessage, "error");
             } finally {
-                // Reset button state
-                googleLoginButton.disabled = false;
-                googleLoginButton.innerHTML = '<i class="fab fa-google btn-icon"></i><span>Continue with Google</span>';
+                hideLoading(googleLoginButton, 
+                    googleLoginButton.querySelector('.btn-icon').nextSibling, 
+                    null);
             }
         });
 
@@ -765,15 +718,16 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 console.log("User is already logged in:", user.email);
-                // Uncomment the lines below if you want to redirect already logged-in users
-                // showToast("You're already logged in. Redirecting...", "success");
-                // setTimeout(() => {
-                //     window.location.href = 'dashboard.html';
-                // }, 1500);
+                // Show a message that they're being redirected
+                showToast("You're already logged in. Redirecting...", "success");
+                // Redirect to dashboard after short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
             }
         });
 
-        // Check for redirect messages and URL parameters
+        // Check if there's a redirect message in session storage (from signup or password reset)
         document.addEventListener('DOMContentLoaded', () => {
             const redirectMessage = sessionStorage.getItem('redirectMessage');
             if (redirectMessage) {
@@ -791,17 +745,6 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
-
-        // Test Firebase connection on page load
-        console.log("Firebase Auth:", auth);
-        console.log("Firebase Firestore:", db);
-        
-        // Test if Firebase is properly initialized
-        if (!firebase.apps.length) {
-            console.error("Firebase is not initialized!");
-        } else {
-            console.log("Firebase initialized successfully");
-        }
     </script>
 </body>
 </html>
